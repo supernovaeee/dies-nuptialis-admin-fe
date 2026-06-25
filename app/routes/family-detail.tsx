@@ -349,7 +349,7 @@ function GuestSection({ family }: { family: AdminFamilyItem }) {
               required
               value={newGuestName}
               onChange={(e) => setNewGuestName(e.target.value)}
-              className="w-full rounded border border-stone-300 px-3 py-2 text-sm focus:border-stone-500 focus:ring-1 focus:ring-stone-500 focus:outline-none"
+              className="w-full rounded border border-stone-300 px-3 py-2 text-sm text-stone-900 focus:border-stone-500 focus:ring-1 focus:ring-stone-500 focus:outline-none"
             />
           </div>
           <div className="flex justify-end gap-3">
@@ -387,7 +387,7 @@ function GuestSection({ family }: { family: AdminFamilyItem }) {
               required
               value={editName}
               onChange={(e) => setEditName(e.target.value)}
-              className="w-full rounded border border-stone-300 px-3 py-2 text-sm focus:border-stone-500 focus:ring-1 focus:ring-stone-500 focus:outline-none"
+              className="w-full rounded border border-stone-300 px-3 py-2 text-sm text-stone-900 focus:border-stone-500 focus:ring-1 focus:ring-stone-500 focus:outline-none"
             />
           </div>
           <div className="flex justify-end gap-3">

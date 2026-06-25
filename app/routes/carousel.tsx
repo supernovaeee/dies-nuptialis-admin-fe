@@ -285,7 +285,7 @@ function CardFormModal({
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full rounded border border-stone-300 px-3 py-2 text-sm focus:border-stone-500 focus:ring-1 focus:ring-stone-500 focus:outline-none"
+            className="w-full rounded border border-stone-300 px-3 py-2 text-sm text-stone-900 focus:border-stone-500 focus:ring-1 focus:ring-stone-500 focus:outline-none"
           />
         </div>
 
@@ -298,7 +298,7 @@ function CardFormModal({
             value={content}
             onChange={(e) => setContent(e.target.value)}
             rows={3}
-            className="w-full rounded border border-stone-300 px-3 py-2 text-sm focus:border-stone-500 focus:ring-1 focus:ring-stone-500 focus:outline-none"
+            className="w-full rounded border border-stone-300 px-3 py-2 text-sm text-stone-900 focus:border-stone-500 focus:ring-1 focus:ring-stone-500 focus:outline-none"
           />
         </div>
 
