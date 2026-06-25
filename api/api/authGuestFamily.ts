@@ -1,5 +1,5 @@
 
-import { FamilyAuthResponse } from '../schema/FamilyAuthResponse'
+import type { FamilyAuthResponse } from '../schema/FamilyAuthResponse'
 
 export interface T_authGuestFamily_body {
   invite_code: string

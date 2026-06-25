@@ -1,4 +1,4 @@
-import { GuestFamily } from '../../model/table/GuestFamily'
+import type { GuestFamily } from '../../model/table/GuestFamily'
 
 export interface Letter {
   id: number;

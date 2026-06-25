@@ -1,5 +1,5 @@
 
-import { AdminRsvpList } from '../schema/AdminRsvpList'
+import type { AdminRsvpList } from '../schema/AdminRsvpList'
 
 export interface T_adminGetRsvps_headers {
   authorization: string

@@ -1,5 +1,5 @@
 
-import { RsvpDetail } from '../schema/RsvpDetail'
+import type { RsvpDetail } from '../schema/RsvpDetail'
 
 export interface T_submitRsvp_headers {
   authorization: string
@@ -7,7 +7,6 @@ export interface T_submitRsvp_headers {
 export interface T_submitRsvp_body {
   attending_main_status: string
   attending_after_party?: string
-  vegetarian?: boolean
   special_notes?: string
   email?: string
 }

@@ -1,5 +1,5 @@
 
-import { UploadResponse } from '../schema/UploadResponse'
+import type { UploadResponse } from '../schema/UploadResponse'
 
 export interface T_adminUploadImage_headers {
   authorization: string

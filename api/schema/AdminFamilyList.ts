@@ -1,4 +1,4 @@
-import { AdminFamilyItem } from '../schema/AdminFamilyItem'
+import type { AdminFamilyItem } from '../schema/AdminFamilyItem'
 
 export interface AdminFamilyList {
   total: number

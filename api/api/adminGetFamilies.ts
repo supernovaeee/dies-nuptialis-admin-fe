@@ -1,5 +1,5 @@
 
-import { AdminFamilyList } from '../schema/AdminFamilyList'
+import type { AdminFamilyList } from '../schema/AdminFamilyList'
 
 export interface T_adminGetFamilies_headers {
   authorization: string

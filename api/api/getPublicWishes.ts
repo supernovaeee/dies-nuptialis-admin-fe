@@ -1,5 +1,5 @@
 
-import { WishPublicList } from '../schema/WishPublicList'
+import type { WishPublicList } from '../schema/WishPublicList'
 
 export interface T_getPublicWishes_query {
   limit?: number

@@ -1,5 +1,5 @@
 
-import { WishModerationResponse } from '../schema/WishModerationResponse'
+import type { WishModerationResponse } from '../schema/WishModerationResponse'
 
 export interface T_adminModerateWish_headers {
   authorization: string

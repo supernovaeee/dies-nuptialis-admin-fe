@@ -1,5 +1,5 @@
 
-import { AdminRsvpSummary } from '../schema/AdminRsvpSummary'
+import type { AdminRsvpSummary } from '../schema/AdminRsvpSummary'
 
 export interface T_adminGetRsvpSummary_headers {
   authorization: string

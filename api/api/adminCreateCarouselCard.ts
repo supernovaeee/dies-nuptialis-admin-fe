@@ -1,5 +1,5 @@
 
-import { CarouselCardItem } from '../schema/CarouselCardItem'
+import type { CarouselCardItem } from '../schema/CarouselCardItem'
 
 export interface T_adminCreateCarouselCard_headers {
   authorization: string

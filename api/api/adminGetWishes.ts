@@ -1,5 +1,5 @@
 
-import { AdminWishList } from '../schema/AdminWishList'
+import type { AdminWishList } from '../schema/AdminWishList'
 
 export interface T_adminGetWishes_headers {
   authorization: string

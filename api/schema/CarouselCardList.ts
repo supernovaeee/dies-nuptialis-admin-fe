@@ -1,4 +1,4 @@
-import { CarouselCardItem } from '../schema/CarouselCardItem'
+import type { CarouselCardItem } from '../schema/CarouselCardItem'
 
 export interface CarouselCardList {
   total: number

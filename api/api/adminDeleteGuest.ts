@@ -1,5 +1,5 @@
 
-import { DeletedResponse } from '../schema/DeletedResponse'
+import type { DeletedResponse } from '../schema/DeletedResponse'
 
 export interface T_adminDeleteGuest_headers {
   authorization: string

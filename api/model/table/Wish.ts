@@ -1,5 +1,5 @@
-import { GuestFamily } from '../../model/table/GuestFamily'
-import { WishStatus } from '../../model/enum/WishStatus'
+import type { GuestFamily } from '../../model/table/GuestFamily'
+import type { WishStatus } from '../../model/enum/WishStatus'
 
 export interface Wish {
   id: number;

@@ -1,5 +1,5 @@
 
-import { AdminAuthResponse } from '../schema/AdminAuthResponse'
+import type { AdminAuthResponse } from '../schema/AdminAuthResponse'
 
 export interface T_adminSignIn_body {
   email: string

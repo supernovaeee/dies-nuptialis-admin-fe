@@ -1,4 +1,4 @@
-import { GuestItem } from '../schema/GuestItem'
+import type { GuestItem } from '../schema/GuestItem'
 
 export interface AdminFamilyItem {
   id: number

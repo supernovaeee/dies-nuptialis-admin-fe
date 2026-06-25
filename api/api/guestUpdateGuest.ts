@@ -1,5 +1,5 @@
 
-import { GuestList } from '../schema/GuestList'
+import type { GuestList } from '../schema/GuestList'
 
 export interface T_guestUpdateGuest_headers {
   authorization: string
@@ -8,7 +8,8 @@ export interface T_guestUpdateGuest_path {
   guest_id: string
 }
 export interface T_guestUpdateGuest_body {
-  name: string
+  name?: string
+  vegetarian?: boolean
 }
 
 

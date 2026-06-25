@@ -1,5 +1,5 @@
 
-import { LetterResponse } from '../schema/LetterResponse'
+import type { LetterResponse } from '../schema/LetterResponse'
 
 export interface T_adminGetLetter_headers {
   authorization: string

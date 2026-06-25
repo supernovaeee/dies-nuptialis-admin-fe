@@ -1,5 +1,5 @@
 
-import { GuestList } from '../schema/GuestList'
+import type { GuestList } from '../schema/GuestList'
 
 export interface T_guestGetGuests_headers {
   authorization: string

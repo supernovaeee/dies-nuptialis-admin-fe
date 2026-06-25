@@ -1,5 +1,5 @@
-import { GuestItem } from '../schema/GuestItem'
-import { RsvpDetail } from '../schema/RsvpDetail'
+import type { GuestItem } from '../schema/GuestItem'
+import type { RsvpDetail } from '../schema/RsvpDetail'
 
 export interface FamilyAuthResponse {
   token: string

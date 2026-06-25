@@ -1,11 +1,12 @@
 
-import { GuestList } from '../schema/GuestList'
+import type { GuestList } from '../schema/GuestList'
 
 export interface T_guestAddGuest_headers {
   authorization: string
 }
 export interface T_guestAddGuest_body {
   name: string
+  vegetarian?: boolean
 }
 
 

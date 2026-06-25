@@ -1,5 +1,5 @@
 
-import { RsvpDetail } from '../schema/RsvpDetail'
+import type { RsvpDetail } from '../schema/RsvpDetail'
 
 export interface T_getRsvp_headers {
   authorization: string

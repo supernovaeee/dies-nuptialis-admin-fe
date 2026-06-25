@@ -1,5 +1,5 @@
 
-import { WishPublicItem } from '../schema/WishPublicItem'
+import type { WishPublicItem } from '../schema/WishPublicItem'
 
 export interface T_submitWish_headers {
   authorization: string

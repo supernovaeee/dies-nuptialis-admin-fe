@@ -1,5 +1,5 @@
 
-import { AdminFamilyItem } from '../schema/AdminFamilyItem'
+import type { AdminFamilyItem } from '../schema/AdminFamilyItem'
 
 export interface T_adminUpdateFamily_headers {
   authorization: string

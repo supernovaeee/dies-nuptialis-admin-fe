@@ -1,5 +1,5 @@
 
-import { GuestItem } from '../schema/GuestItem'
+import type { GuestItem } from '../schema/GuestItem'
 
 export interface T_adminAddGuest_headers {
   authorization: string
@@ -9,6 +9,7 @@ export interface T_adminAddGuest_path {
 }
 export interface T_adminAddGuest_body {
   name: string
+  vegetarian?: boolean
 }
 
 

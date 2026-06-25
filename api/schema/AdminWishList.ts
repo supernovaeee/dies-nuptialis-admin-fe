@@ -1,4 +1,4 @@
-import { AdminWishItem } from '../schema/AdminWishItem'
+import type { AdminWishItem } from '../schema/AdminWishItem'
 
 export interface AdminWishList {
   total: number

@@ -1,5 +1,5 @@
 
-import { CarouselCardList } from '../schema/CarouselCardList'
+import type { CarouselCardList } from '../schema/CarouselCardList'
 
 export interface T_adminGetCarouselCards_headers {
   authorization: string

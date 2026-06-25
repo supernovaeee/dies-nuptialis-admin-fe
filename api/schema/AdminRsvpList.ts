@@ -1,4 +1,4 @@
-import { AdminRsvpItem } from '../schema/AdminRsvpItem'
+import type { AdminRsvpItem } from '../schema/AdminRsvpItem'
 
 export interface AdminRsvpList {
   total: number
