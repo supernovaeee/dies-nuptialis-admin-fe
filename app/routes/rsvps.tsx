@@ -1,20 +1,44 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
+import { Link, useSearchParams } from 'react-router'
 import { useRsvps } from '~/hooks/useRsvps'
 import { useRsvpSummary } from '~/hooks/useRsvpSummary'
 import { useExportRsvp } from '~/hooks/useExportRsvp'
 import { useToast } from '~/context/ToastContext'
 import { getApiErrorMessage } from '~/lib/apiError'
+import { ROUTES } from '~/constants'
 import { Pagination } from '~/components/ui/Pagination'
 import { EmptyState } from '~/components/ui/EmptyState'
 
 const LIMIT = 50
+const FILTERED_LIMIT = 1000
 
 export default function RsvpsPage() {
   const toast = useToast()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const mainFilter = searchParams.get('main')
+  const afterPartyFilter = searchParams.get('after_party')
+  const hasFilter = !!mainFilter || !!afterPartyFilter
+
   const [page, setPage] = useState(0)
   const { data: summary, isLoading: summaryLoading } = useRsvpSummary()
-  const { data, isLoading, error } = useRsvps(page, LIMIT)
+  const { data, isLoading, error } = useRsvps(page, hasFilter ? FILTERED_LIMIT : LIMIT)
   const exportRsvp = useExportRsvp()
+
+  const filteredData = useMemo(() => {
+    if (!data) return null
+    if (!hasFilter) return data
+    const filtered = data.data.filter((rsvp) => {
+      if (mainFilter && rsvp.attending_main_status !== mainFilter) return false
+      if (afterPartyFilter && rsvp.attending_after_party !== afterPartyFilter) return false
+      return true
+    })
+    return { total: filtered.length, data: filtered }
+  }, [data, mainFilter, afterPartyFilter, hasFilter])
+
+  function clearFilter() {
+    setSearchParams({})
+    setPage(0)
+  }
 
   function handleExport() {
     exportRsvp.mutate(undefined, {
@@ -44,6 +68,28 @@ export default function RsvpsPage() {
         <MiniStat label="Pending" value={summary?.pending_main} loading={summaryLoading} color="amber" />
       </div>
 
+      {hasFilter && (
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-stone-500">Filtering by:</span>
+          {mainFilter && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-stone-100 px-2.5 py-1 text-xs font-medium text-stone-700">
+              Main: {mainFilter}
+            </span>
+          )}
+          {afterPartyFilter && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-stone-100 px-2.5 py-1 text-xs font-medium text-stone-700">
+              After Party: {afterPartyFilter}
+            </span>
+          )}
+          <button
+            onClick={clearFilter}
+            className="rounded px-2 py-1 text-xs text-stone-500 hover:bg-stone-100 hover:text-stone-700"
+          >
+            Clear
+          </button>
+        </div>
+      )}
+
       {error && (
         <div role="alert" className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           Failed to load RSVPs.
@@ -58,11 +104,14 @@ export default function RsvpsPage() {
         </div>
       )}
 
-      {data && data.data.length === 0 && (
-        <EmptyState title="No RSVPs yet" description="RSVPs will appear here once guests respond." />
+      {filteredData && filteredData.data.length === 0 && (
+        <EmptyState
+          title={hasFilter ? 'No matching RSVPs' : 'No RSVPs yet'}
+          description={hasFilter ? 'Try clearing the filter.' : 'RSVPs will appear here once guests respond.'}
+        />
       )}
 
-      {data && data.data.length > 0 && (
+      {filteredData && filteredData.data.length > 0 && (
         <>
           <div className="overflow-x-auto rounded-lg border border-stone-200">
             <table className="w-full text-left text-sm">
@@ -77,10 +126,15 @@ export default function RsvpsPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-100">
-                {data.data.map((rsvp) => (
+                {filteredData.data.map((rsvp) => (
                   <tr key={rsvp.id} className="hover:bg-stone-50">
-                    <td className="px-4 py-3 font-medium text-stone-900">
-                      {rsvp.fam_name}
+                    <td className="px-4 py-3">
+                      <Link
+                        to={ROUTES.FAMILY_DETAIL(rsvp.family_id)}
+                        className="font-medium text-stone-900 hover:underline"
+                      >
+                        {rsvp.fam_name}
+                      </Link>
                     </td>
                     <td className="px-4 py-3">
                       <RsvpBadge status={rsvp.attending_main_status} />
@@ -103,12 +157,14 @@ export default function RsvpsPage() {
             </table>
           </div>
 
-          <Pagination
-            page={page}
-            total={data.total}
-            limit={LIMIT}
-            onPageChange={setPage}
-          />
+          {!hasFilter && (
+            <Pagination
+              page={page}
+              total={data!.total}
+              limit={LIMIT}
+              onPageChange={setPage}
+            />
+          )}
         </>
       )}
     </div>

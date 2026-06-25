@@ -25,52 +25,61 @@ export default function DashboardPage() {
           label="Total Families"
           value={data?.total_families}
           loading={isLoading}
+          to={ROUTES.FAMILIES}
         />
         <SummaryCard
           label="RSVPs Submitted"
           value={data?.total_rsvp_submitted}
           loading={isLoading}
+          to={ROUTES.RSVPS}
         />
         <SummaryCard
           label="Attending (Main)"
           value={data?.attending_main}
           loading={isLoading}
           color="emerald"
+          to={`${ROUTES.RSVPS}?main=ATTENDING`}
         />
         <SummaryCard
           label="Declined (Main)"
           value={data?.declined_main}
           loading={isLoading}
           color="red"
+          to={`${ROUTES.RSVPS}?main=DECLINED`}
         />
         <SummaryCard
           label="Pending (Main)"
           value={data?.pending_main}
           loading={isLoading}
           color="amber"
+          to={`${ROUTES.RSVPS}?main=PENDING`}
         />
         <SummaryCard
           label="Attending (After Party)"
           value={data?.attending_after_party}
           loading={isLoading}
           color="emerald"
+          to={`${ROUTES.RSVPS}?after_party=ATTENDING`}
         />
         <SummaryCard
           label="Declined (After Party)"
           value={data?.declined_after_party}
           loading={isLoading}
           color="red"
+          to={`${ROUTES.RSVPS}?after_party=DECLINED`}
         />
         <SummaryCard
           label="Pending (After Party)"
           value={data?.pending_after_party}
           loading={isLoading}
           color="amber"
+          to={`${ROUTES.RSVPS}?after_party=PENDING`}
         />
         <SummaryCard
           label="Vegetarian"
           value={data?.vegetarian_count}
           loading={isLoading}
+          to={`${ROUTES.FAMILIES}?show=vegetarian`}
         />
       </div>
 
@@ -92,9 +101,10 @@ interface SummaryCardProps {
   value: number | undefined
   loading: boolean
   color?: 'emerald' | 'red' | 'amber'
+  to?: string
 }
 
-function SummaryCard({ label, value, loading, color }: SummaryCardProps) {
+function SummaryCard({ label, value, loading, color, to }: SummaryCardProps) {
   const valueColor =
     color === 'emerald'
       ? 'text-emerald-700'
@@ -104,8 +114,8 @@ function SummaryCard({ label, value, loading, color }: SummaryCardProps) {
           ? 'text-amber-700'
           : 'text-stone-900'
 
-  return (
-    <div className="rounded-lg border border-stone-200 bg-white px-4 py-3">
+  const content = (
+    <>
       <p className="text-xs text-stone-500">{label}</p>
       {loading ? (
         <div className="mt-1 h-7 w-12 animate-pulse rounded bg-stone-100" />
@@ -114,6 +124,23 @@ function SummaryCard({ label, value, loading, color }: SummaryCardProps) {
           {value ?? '–'}
         </p>
       )}
+    </>
+  )
+
+  if (to) {
+    return (
+      <Link
+        to={to}
+        className="block rounded-lg border border-stone-200 bg-white px-4 py-3 transition-colors hover:border-stone-300 hover:bg-stone-50"
+      >
+        {content}
+      </Link>
+    )
+  }
+
+  return (
+    <div className="rounded-lg border border-stone-200 bg-white px-4 py-3">
+      {content}
     </div>
   )
 }
