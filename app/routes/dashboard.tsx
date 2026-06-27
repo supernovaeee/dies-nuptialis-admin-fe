@@ -24,6 +24,7 @@ export default function DashboardPage() {
         <SummaryCard
           label="Total Families"
           value={data?.total_families}
+          subtitle={data ? `${data.total_family_members} members` : undefined}
           loading={isLoading}
           to={ROUTES.FAMILIES}
         />
@@ -34,46 +35,28 @@ export default function DashboardPage() {
           to={ROUTES.RSVPS}
         />
         <SummaryCard
-          label="Attending (Main)"
-          value={data?.attending_main}
+          label="Attending"
+          value={data?.attending_families}
+          subtitle={data ? `${data.attending_members} members` : undefined}
           loading={isLoading}
           color="emerald"
           to={`${ROUTES.RSVPS}?main=ATTENDING`}
         />
         <SummaryCard
-          label="Declined (Main)"
-          value={data?.declined_main}
+          label="Declined"
+          value={data?.declined_families}
+          subtitle={data ? `${data.declined_members} members` : undefined}
           loading={isLoading}
           color="red"
           to={`${ROUTES.RSVPS}?main=DECLINED`}
         />
         <SummaryCard
-          label="Pending (Main)"
-          value={data?.pending_main}
+          label="Pending"
+          value={data?.pending_families}
+          subtitle={data ? `${data.pending_members} members` : undefined}
           loading={isLoading}
           color="amber"
           to={`${ROUTES.RSVPS}?main=PENDING`}
-        />
-        <SummaryCard
-          label="Attending (After Party)"
-          value={data?.attending_after_party}
-          loading={isLoading}
-          color="emerald"
-          to={`${ROUTES.RSVPS}?after_party=ATTENDING`}
-        />
-        <SummaryCard
-          label="Declined (After Party)"
-          value={data?.declined_after_party}
-          loading={isLoading}
-          color="red"
-          to={`${ROUTES.RSVPS}?after_party=DECLINED`}
-        />
-        <SummaryCard
-          label="Pending (After Party)"
-          value={data?.pending_after_party}
-          loading={isLoading}
-          color="amber"
-          to={`${ROUTES.RSVPS}?after_party=PENDING`}
         />
         <SummaryCard
           label="Vegetarian"
@@ -99,12 +82,13 @@ export default function DashboardPage() {
 interface SummaryCardProps {
   label: string
   value: number | undefined
+  subtitle?: string
   loading: boolean
   color?: 'emerald' | 'red' | 'amber'
   to?: string
 }
 
-function SummaryCard({ label, value, loading, color, to }: SummaryCardProps) {
+function SummaryCard({ label, value, loading, color, subtitle, to }: SummaryCardProps) {
   const valueColor =
     color === 'emerald'
       ? 'text-emerald-700'
@@ -118,11 +102,21 @@ function SummaryCard({ label, value, loading, color, to }: SummaryCardProps) {
     <>
       <p className="text-xs text-stone-500">{label}</p>
       {loading ? (
-        <div className="mt-1 h-7 w-12 animate-pulse rounded bg-stone-100" />
+        <div className="mt-1 space-y-1">
+          <div className="h-7 w-12 animate-pulse rounded bg-stone-100" />
+          {subtitle !== undefined && (
+            <div className="h-4 w-16 animate-pulse rounded bg-stone-100" />
+          )}
+        </div>
       ) : (
-        <p className={`mt-1 text-2xl font-semibold ${valueColor}`}>
-          {value ?? '–'}
-        </p>
+        <>
+          <p className={`mt-1 text-2xl font-semibold ${valueColor}`}>
+            {value ?? '–'}
+          </p>
+          {subtitle && (
+            <p className="text-xs text-stone-400">{subtitle}</p>
+          )}
+        </>
       )}
     </>
   )

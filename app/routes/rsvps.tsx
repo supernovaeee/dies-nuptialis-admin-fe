@@ -61,11 +61,46 @@ export default function RsvpsPage() {
         </button>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <MiniStat label="Submitted" value={summary?.total_rsvp_submitted} loading={summaryLoading} />
-        <MiniStat label="Attending" value={summary?.attending_main} loading={summaryLoading} color="emerald" />
-        <MiniStat label="Declined" value={summary?.declined_main} loading={summaryLoading} color="red" />
-        <MiniStat label="Pending" value={summary?.pending_main} loading={summaryLoading} color="amber" />
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+        <SummaryStat
+          label="Total"
+          families={summary?.total_families}
+          members={summary?.total_family_members}
+          loading={summaryLoading}
+        />
+        <SummaryStat
+          label="Submitted"
+          families={summary?.total_rsvp_submitted}
+          loading={summaryLoading}
+          familiesLabel="responses"
+        />
+        <SummaryStat
+          label="Attending"
+          families={summary?.attending_families}
+          members={summary?.attending_members}
+          loading={summaryLoading}
+          color="emerald"
+        />
+        <SummaryStat
+          label="Declined"
+          families={summary?.declined_families}
+          members={summary?.declined_members}
+          loading={summaryLoading}
+          color="red"
+        />
+        <SummaryStat
+          label="Pending"
+          families={summary?.pending_families}
+          members={summary?.pending_members}
+          loading={summaryLoading}
+          color="amber"
+        />
+        <SummaryStat
+          label="Vegetarian"
+          families={summary?.vegetarian_count}
+          loading={summaryLoading}
+          familiesLabel="people"
+        />
       </div>
 
       {hasFilter && (
@@ -187,17 +222,23 @@ function RsvpBadge({ status }: { status: string }) {
   )
 }
 
-function MiniStat({
-  label,
-  value,
-  loading,
-  color,
-}: {
+interface SummaryStatProps {
   label: string
-  value: number | undefined
+  families: number | undefined
+  members?: number | undefined
   loading: boolean
   color?: 'emerald' | 'red' | 'amber'
-}) {
+  familiesLabel?: string
+}
+
+function SummaryStat({
+  label,
+  families,
+  members,
+  loading,
+  color,
+  familiesLabel = 'families',
+}: SummaryStatProps) {
   const textColor =
     color === 'emerald'
       ? 'text-emerald-700'
@@ -211,11 +252,25 @@ function MiniStat({
     <div className="rounded-lg border border-stone-200 bg-white px-3 py-2">
       <p className="text-xs text-stone-500">{label}</p>
       {loading ? (
-        <div className="mt-1 h-6 w-8 animate-pulse rounded bg-stone-100" />
+        <div className="mt-1 space-y-1">
+          <div className="h-5 w-16 animate-pulse rounded bg-stone-100" />
+          {members !== undefined && (
+            <div className="h-4 w-14 animate-pulse rounded bg-stone-100" />
+          )}
+        </div>
       ) : (
-        <p className={`mt-0.5 text-xl font-semibold ${textColor}`}>
-          {value ?? '–'}
-        </p>
+        <div className="mt-0.5">
+          <p className={`text-lg font-semibold ${textColor}`}>
+            {families ?? '–'}{' '}
+            <span className="text-xs font-normal text-stone-400">{familiesLabel}</span>
+          </p>
+          {members !== undefined && (
+            <p className={`text-lg font-semibold ${textColor}`}>
+              {members ?? '–'}{' '}
+              <span className="text-xs font-normal text-stone-400">members</span>
+            </p>
+          )}
+        </div>
       )}
     </div>
   )
