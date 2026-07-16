@@ -1,17 +1,33 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import axios from 'axios'
 import { AxiosClient } from '@api/AxiosClient'
 import type { LetterResponse } from '@api/schema/LetterResponse'
 import { QUERY_KEYS } from '~/constants'
 import { AUTH_HEADER } from '~/lib/authHeader'
 
 export function useLetter(familyId: string) {
-  return useQuery<LetterResponse>({
+  return useQuery<LetterResponse | null>({
     queryKey: QUERY_KEYS.FAMILY_LETTER(familyId),
-    queryFn: () =>
-      AxiosClient.adminGetLetter({
-        headers: AUTH_HEADER,
-        path: { family_id: familyId },
-      }),
+    queryFn: async () => {
+      try {
+        return await AxiosClient.adminGetLetter({
+          headers: AUTH_HEADER,
+          path: { family_id: familyId },
+        })
+      } catch (err) {
+        // "No letter found for this family" means the family exists but
+        // hasn't been written one yet — expected, not an error. Any other
+        // 404 (e.g. "Family not found") is a real error and must propagate.
+        if (
+          axios.isAxiosError<{ error: string }>(err) &&
+          err.response?.status === 404 &&
+          err.response.data?.error === 'No letter found for this family'
+        ) {
+          return null
+        }
+        throw err
+      }
+    },
     enabled: !!familyId,
   })
 }
