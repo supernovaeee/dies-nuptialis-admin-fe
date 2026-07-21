@@ -10,6 +10,7 @@ import { getApiErrorMessage } from '~/lib/apiError'
 import { Modal } from '~/components/ui/Modal'
 import { ConfirmDialog } from '~/components/ui/ConfirmDialog'
 import { EmptyState } from '~/components/ui/EmptyState'
+import { ImageCropper } from '~/components/ui/ImageCropper'
 import type { CarouselCardItem } from '@api/schema/CarouselCardItem'
 
 export default function CarouselPage() {
@@ -214,27 +215,36 @@ function CardFormModal({
   const [title, setTitle] = useState(card?.title ?? '')
   const [content, setContent] = useState(card?.content ?? '')
   const [imageUrl, setImageUrl] = useState(card?.image_url ?? '')
+  const [cropSrc, setCropSrc] = useState<string | null>(null)
 
   const isPending =
     createCard.isPending || updateCard.isPending || uploadImage.isPending
 
-  async function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
+    e.target.value = ''
     if (!file) return
+    setCropSrc(URL.createObjectURL(file))
+  }
 
-    const reader = new FileReader()
-    reader.onload = () => {
-      const base64 = (reader.result as string).split(',')[1]
-      uploadImage.mutate(base64, {
-        onSuccess: (res) => {
-          setImageUrl(res.url)
-          toast.success('Image uploaded')
-        },
-        onError: (err) =>
-          toast.error(getApiErrorMessage(err, 'Failed to upload image')),
-      })
-    }
-    reader.readAsDataURL(file)
+  function handleCropCancel() {
+    if (cropSrc) URL.revokeObjectURL(cropSrc)
+    setCropSrc(null)
+  }
+
+  function handleCropConfirm(base64: string) {
+    uploadImage.mutate(base64, {
+      onSuccess: (res) => {
+        setImageUrl(res.url)
+        toast.success('Image uploaded')
+      },
+      onError: (err) =>
+        toast.error(getApiErrorMessage(err, 'Failed to upload image')),
+      onSettled: () => {
+        if (cropSrc) URL.revokeObjectURL(cropSrc)
+        setCropSrc(null)
+      },
+    })
   }
 
   function handleSubmit(e: FormEvent) {
@@ -270,6 +280,7 @@ function CardFormModal({
   }
 
   return (
+    <>
     <Modal
       open={open}
       onClose={onClose}
@@ -307,18 +318,19 @@ function CardFormModal({
             Image
           </label>
           {imageUrl && (
-            <img
-              src={imageUrl}
-              alt=""
-              className="mb-2 h-32 w-auto rounded border border-stone-200 object-cover"
-            />
+            <div className="mb-2 w-28 overflow-hidden rounded border border-stone-200">
+              <img src={imageUrl} alt="" className="aspect-[3/4] w-full object-cover" />
+            </div>
           )}
           <input
             type="file"
             accept="image/*"
-            onChange={handleImageChange}
+            onChange={handleFileSelect}
             className="block w-full text-sm text-stone-500 file:mr-3 file:rounded file:border-0 file:bg-stone-100 file:px-3 file:py-1.5 file:text-sm file:text-stone-700 hover:file:bg-stone-200"
           />
+          <p className="text-xs text-stone-500">
+            Preview is shown at the carousel card's 3:4 aspect ratio.
+          </p>
           {uploadImage.isPending && (
             <p className="text-xs text-stone-500">Uploading...</p>
           )}
@@ -346,5 +358,13 @@ function CardFormModal({
         </div>
       </form>
     </Modal>
+    <ImageCropper
+      open={!!cropSrc}
+      imageSrc={cropSrc}
+      loading={uploadImage.isPending}
+      onCancel={handleCropCancel}
+      onConfirm={handleCropConfirm}
+    />
+    </>
   )
 }
