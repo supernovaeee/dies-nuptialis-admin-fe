@@ -54,7 +54,7 @@ export function Modal({ open, onClose, title, children }: ModalProps) {
   return (
     <div
       ref={overlayRef}
-      className="fixed inset-0 z-40 flex items-center justify-center bg-black/40"
+      className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 p-4"
       onClick={(e) => {
         if (e.target === overlayRef.current) onClose()
       }}
@@ -63,9 +63,9 @@ export function Modal({ open, onClose, title, children }: ModalProps) {
     >
       <div
         ref={contentRef}
-        className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl"
+        className="flex max-h-[85vh] w-full max-w-md flex-col rounded-lg bg-white shadow-xl"
       >
-        <div className="mb-4 flex items-center justify-between">
+        <div className="flex items-center justify-between px-6 pt-6 pb-4">
           <h2 className="text-base font-medium text-stone-900">{title}</h2>
           <button
             onClick={onClose}
@@ -82,7 +82,7 @@ export function Modal({ open, onClose, title, children }: ModalProps) {
             </svg>
           </button>
         </div>
-        {children}
+        <div className="overflow-y-auto px-6 pb-6">{children}</div>
       </div>
     </div>
   )
