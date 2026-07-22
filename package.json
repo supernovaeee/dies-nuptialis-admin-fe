@@ -10,6 +10,9 @@
     "codegen:api": "npx @naiv/codegen-axios-client@latest -d ../dies-nuptialis/dies-nuptialis/design -o api && node scripts/patch-axios-base-url.mjs && node scripts/patch-verbatim-imports.mjs"
   },
   "dependencies": {
+    "@blocknote/core": "^0.52.1",
+    "@blocknote/mantine": "^0.52.1",
+    "@blocknote/react": "^0.52.1",
     "@react-router/node": "8.0.0",
     "@react-router/serve": "8.0.0",
     "@tanstack/react-query": "^5.101.1",

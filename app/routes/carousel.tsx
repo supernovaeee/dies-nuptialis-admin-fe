@@ -7,10 +7,12 @@ import { useReorderCarouselCards } from '~/hooks/useReorderCarouselCards'
 import { useUploadImage } from '~/hooks/useUploadImage'
 import { useToast } from '~/context/ToastContext'
 import { getApiErrorMessage } from '~/lib/apiError'
+import { stripHtml } from '~/lib/stripHtml'
 import { Modal } from '~/components/ui/Modal'
 import { ConfirmDialog } from '~/components/ui/ConfirmDialog'
 import { EmptyState } from '~/components/ui/EmptyState'
 import { ImageCropper } from '~/components/ui/ImageCropper'
+import { RichTextEditor } from '~/components/ui/RichTextEditor'
 import type { CarouselCardItem } from '@api/schema/CarouselCardItem'
 
 export default function CarouselPage() {
@@ -122,7 +124,7 @@ export default function CarouselPage() {
                 </h3>
                 {card.content && (
                   <p className="mt-1 flex-1 text-xs text-stone-500 line-clamp-2">
-                    {card.content}
+                    {stripHtml(card.content)}
                   </p>
                 )}
                 <div className="mt-3 flex items-center justify-between">
@@ -301,16 +303,12 @@ function CardFormModal({
         </div>
 
         <div className="space-y-1.5">
-          <label htmlFor="card_content" className="block text-sm font-medium text-stone-700">
+          <label id="card_content_label" className="block text-sm font-medium text-stone-700">
             Content
           </label>
-          <textarea
-            id="card_content"
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            rows={3}
-            className="w-full rounded border border-stone-300 px-3 py-2 text-sm text-stone-900 focus:border-stone-500 focus:ring-1 focus:ring-stone-500 focus:outline-none"
-          />
+          <div aria-labelledby="card_content_label">
+            <RichTextEditor initialContent={content} onChange={setContent} />
+          </div>
         </div>
 
         <div className="space-y-1.5">
