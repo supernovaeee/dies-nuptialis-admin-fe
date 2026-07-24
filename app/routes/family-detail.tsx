@@ -8,9 +8,11 @@ import { useAddGuest, useUpdateGuest, useDeleteGuest } from '~/hooks/useGuests'
 import { useLetter, useUpsertLetter } from '~/hooks/useLetter'
 import { useToast } from '~/context/ToastContext'
 import { getApiErrorMessage } from '~/lib/apiError'
+import { sanitizeHtml } from '~/lib/sanitizeHtml'
 import { ROUTES } from '~/constants'
 import { Modal } from '~/components/ui/Modal'
 import { ConfirmDialog } from '~/components/ui/ConfirmDialog'
+import { RichTextEditor } from '~/components/ui/RichTextEditor'
 import type { AdminFamilyItem } from '@api/schema/AdminFamilyItem'
 import type { GuestItem } from '@api/schema/GuestItem'
 
@@ -466,20 +468,19 @@ function LetterSection({ familyId }: { familyId: string }) {
       )}
 
       {!isLoading && !editing && (
-        <p className="text-sm text-stone-600 whitespace-pre-wrap">
-          {data?.letter_text || 'No letter written yet.'}
-        </p>
+        data?.letter_text ? (
+          <div
+            className="text-sm text-stone-600 [&_p]:mb-2 [&_h1]:text-lg [&_h1]:font-semibold [&_h2]:text-base [&_h2]:font-semibold [&_h3]:font-medium [&_ul]:list-disc [&_ul]:pl-5 [&_ol]:list-decimal [&_ol]:pl-5 [&_a]:underline [&_img]:max-w-full [&_img]:rounded [&_blockquote]:border-l-2 [&_blockquote]:border-stone-300 [&_blockquote]:pl-3 [&_blockquote]:text-stone-500"
+            dangerouslySetInnerHTML={{ __html: sanitizeHtml(data.letter_text) }}
+          />
+        ) : (
+          <p className="text-sm text-stone-600">No letter written yet.</p>
+        )
       )}
 
       {editing && (
         <form onSubmit={handleSave} className="space-y-3">
-          <textarea
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            rows={6}
-            className="w-full rounded border border-stone-300 px-3 py-2 text-sm text-stone-900 focus:border-stone-500 focus:ring-1 focus:ring-stone-500 focus:outline-none"
-            placeholder="Write a personal letter for this family..."
-          />
+          <RichTextEditor initialContent={text} onChange={setText} />
           <div className="flex gap-2">
             <button
               type="submit"
