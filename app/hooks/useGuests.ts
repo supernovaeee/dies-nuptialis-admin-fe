@@ -23,12 +23,12 @@ export function useAddGuest() {
 export function useUpdateGuest() {
   const queryClient = useQueryClient()
 
-  return useMutation<GuestItem, unknown, { guestId: string; name: string }>({
-    mutationFn: ({ guestId, name }) =>
+  return useMutation<GuestItem, unknown, { guestId: string; name: string; vegetarian: boolean }>({
+    mutationFn: ({ guestId, name, vegetarian }) =>
       AxiosClient.adminUpdateGuest({
         headers: AUTH_HEADER,
         path: { guest_id: guestId },
-        body: { name },
+        body: { name, vegetarian },
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['families'] })

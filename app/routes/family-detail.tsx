@@ -240,6 +240,7 @@ function GuestSection({ family }: { family: AdminFamilyItem }) {
   const [newGuestName, setNewGuestName] = useState('')
   const [editingGuest, setEditingGuest] = useState<GuestItem | null>(null)
   const [editName, setEditName] = useState('')
+  const [editVegetarian, setEditVegetarian] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<GuestItem | null>(null)
 
   function handleAddGuest(e: FormEvent) {
@@ -263,7 +264,7 @@ function GuestSection({ family }: { family: AdminFamilyItem }) {
     e.preventDefault()
     if (!editingGuest) return
     updateGuest.mutate(
-      { guestId: String(editingGuest.id), name: editName },
+      { guestId: String(editingGuest.id), name: editName, vegetarian: editVegetarian },
       {
         onSuccess: () => {
           toast.success('Guest updated')
@@ -322,6 +323,7 @@ function GuestSection({ family }: { family: AdminFamilyItem }) {
                   onClick={() => {
                     setEditingGuest(guest)
                     setEditName(guest.name)
+                    setEditVegetarian(guest.vegetarian)
                   }}
                   className="rounded px-2 py-1 text-xs text-stone-600 hover:bg-stone-100"
                 >
@@ -391,6 +393,18 @@ function GuestSection({ family }: { family: AdminFamilyItem }) {
               onChange={(e) => setEditName(e.target.value)}
               className="w-full rounded border border-stone-300 px-3 py-2 text-sm text-stone-900 focus:border-stone-500 focus:ring-1 focus:ring-stone-500 focus:outline-none"
             />
+          </div>
+          <div className="flex items-center gap-2">
+            <input
+              id="edit_guest_vegetarian"
+              type="checkbox"
+              checked={editVegetarian}
+              onChange={(e) => setEditVegetarian(e.target.checked)}
+              className="h-4 w-4 rounded border-stone-300"
+            />
+            <label htmlFor="edit_guest_vegetarian" className="text-sm text-stone-700">
+              Vegetarian
+            </label>
           </div>
           <div className="flex justify-end gap-3">
             <button
