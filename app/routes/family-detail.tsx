@@ -103,7 +103,6 @@ function FamilyInfoSection({ family }: { family: AdminFamilyItem }) {
   const [editing, setEditing] = useState(false)
   const [famName, setFamName] = useState(family.fam_name)
   const [paxAllowed, setPaxAllowed] = useState(family.pax_allowed)
-  const [afterParty, setAfterParty] = useState(family.after_party_allowed)
 
   function handleSave(e: FormEvent) {
     e.preventDefault()
@@ -113,7 +112,6 @@ function FamilyInfoSection({ family }: { family: AdminFamilyItem }) {
         body: {
           fam_name: famName,
           pax_allowed: paxAllowed,
-          after_party_allowed: afterParty,
         },
       },
       {
@@ -131,7 +129,6 @@ function FamilyInfoSection({ family }: { family: AdminFamilyItem }) {
   function handleCancel() {
     setFamName(family.fam_name)
     setPaxAllowed(family.pax_allowed)
-    setAfterParty(family.after_party_allowed)
     setEditing(false)
   }
 
@@ -177,18 +174,6 @@ function FamilyInfoSection({ family }: { family: AdminFamilyItem }) {
               className="w-full rounded border border-stone-300 px-3 py-1.5 text-sm text-stone-900 focus:border-stone-500 focus:ring-1 focus:ring-stone-500 focus:outline-none"
             />
           </div>
-          <div className="flex items-center gap-2">
-            <input
-              id="edit_after_party"
-              type="checkbox"
-              checked={afterParty}
-              onChange={(e) => setAfterParty(e.target.checked)}
-              className="h-4 w-4 rounded border-stone-300"
-            />
-            <label htmlFor="edit_after_party" className="text-sm text-stone-700">
-              After party allowed
-            </label>
-          </div>
           <div className="flex gap-2 pt-1">
             <button
               type="submit"
@@ -207,16 +192,10 @@ function FamilyInfoSection({ family }: { family: AdminFamilyItem }) {
           </div>
         </form>
       ) : (
-        <dl className="grid grid-cols-3 gap-4 text-sm">
+        <dl className="grid grid-cols-2 gap-4 text-sm">
           <div>
             <dt className="text-xs text-stone-500">Pax Allowed</dt>
             <dd className="mt-0.5 text-stone-900">{family.pax_allowed}</dd>
-          </div>
-          <div>
-            <dt className="text-xs text-stone-500">After Party</dt>
-            <dd className="mt-0.5 text-stone-900">
-              {family.after_party_allowed ? 'Yes' : 'No'}
-            </dd>
           </div>
           <div>
             <dt className="text-xs text-stone-500">RSVP</dt>

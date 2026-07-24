@@ -172,7 +172,6 @@ export default function FamiliesPage() {
                 <th className="px-4 py-3 font-medium text-stone-600">Family Name</th>
                 <th className="px-4 py-3 font-medium text-stone-600">Invite Code</th>
                 <th className="px-4 py-3 font-medium text-stone-600 text-center">Pax</th>
-                <th className="px-4 py-3 font-medium text-stone-600 text-center">After Party</th>
                 <th className="px-4 py-3 font-medium text-stone-600 text-center">Guests</th>
                 <th className="px-4 py-3 font-medium text-stone-600 text-center">RSVP</th>
                 <th className="px-4 py-3 font-medium text-stone-600 text-center">Letter</th>
@@ -195,9 +194,6 @@ export default function FamiliesPage() {
                   </td>
                   <td className="px-4 py-3 text-center text-stone-700">
                     {family.pax_allowed}
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <StatusBadge active={family.after_party_allowed} />
                   </td>
                   <td className="px-4 py-3 text-center text-stone-700">
                     {family.guests.length}
@@ -260,7 +256,6 @@ function CreateFamilyModal({
   const createFamily = useCreateFamily()
   const [famName, setFamName] = useState('')
   const [paxAllowed, setPaxAllowed] = useState(1)
-  const [afterParty, setAfterParty] = useState(false)
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -268,14 +263,12 @@ function CreateFamilyModal({
       {
         fam_name: famName,
         pax_allowed: paxAllowed,
-        after_party_allowed: afterParty,
       },
       {
         onSuccess: () => {
           toast.success('Family created')
           setFamName('')
           setPaxAllowed(1)
-          setAfterParty(false)
           onClose()
         },
         onError: (err) => {
@@ -314,19 +307,6 @@ function CreateFamilyModal({
             onChange={(e) => setPaxAllowed(Number(e.target.value))}
             className="w-full rounded border border-stone-300 px-3 py-2 text-sm text-stone-900 focus:border-stone-500 focus:ring-1 focus:ring-stone-500 focus:outline-none"
           />
-        </div>
-
-        <div className="flex items-center gap-2">
-          <input
-            id="after_party"
-            type="checkbox"
-            checked={afterParty}
-            onChange={(e) => setAfterParty(e.target.checked)}
-            className="h-4 w-4 rounded border-stone-300"
-          />
-          <label htmlFor="after_party" className="text-sm text-stone-700">
-            After party allowed
-          </label>
         </div>
 
         <div className="flex justify-end gap-3 pt-2">

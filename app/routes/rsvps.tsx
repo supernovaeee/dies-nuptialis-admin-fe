@@ -22,8 +22,7 @@ export default function RsvpsPage() {
   const toast = useToast()
   const [searchParams, setSearchParams] = useSearchParams()
   const mainFilter = searchParams.get('main')
-  const afterPartyFilter = searchParams.get('after_party')
-  const hasFilter = !!mainFilter || !!afterPartyFilter
+  const hasFilter = !!mainFilter
 
   const [page, setPage] = useState(0)
   const { data: summary, isLoading: summaryLoading } = useRsvpSummary()
@@ -34,7 +33,6 @@ export default function RsvpsPage() {
 
   const [editingRsvp, setEditingRsvp] = useState<AdminRsvpItem | null>(null)
   const [editMainStatus, setEditMainStatus] = useState<string>(RSVPStatus.PENDING)
-  const [editAfterPartyStatus, setEditAfterPartyStatus] = useState<string>(RSVPStatus.PENDING)
   const [editNotes, setEditNotes] = useState('')
   const [editEmail, setEditEmail] = useState('')
   const [deleteTarget, setDeleteTarget] = useState<AdminRsvpItem | null>(null)
@@ -44,11 +42,10 @@ export default function RsvpsPage() {
     if (!hasFilter) return data
     const filtered = data.data.filter((rsvp) => {
       if (mainFilter && rsvp.attending_main_status !== mainFilter) return false
-      if (afterPartyFilter && rsvp.attending_after_party !== afterPartyFilter) return false
       return true
     })
     return { total: filtered.length, data: filtered }
-  }, [data, mainFilter, afterPartyFilter, hasFilter])
+  }, [data, mainFilter, hasFilter])
 
   function clearFilter() {
     setSearchParams({})
@@ -58,7 +55,6 @@ export default function RsvpsPage() {
   function openEdit(rsvp: AdminRsvpItem) {
     setEditingRsvp(rsvp)
     setEditMainStatus(rsvp.attending_main_status)
-    setEditAfterPartyStatus(rsvp.attending_after_party)
     setEditNotes(rsvp.special_notes ?? '')
     setEditEmail(rsvp.email ?? '')
   }
@@ -71,7 +67,6 @@ export default function RsvpsPage() {
         rsvpId: String(editingRsvp.id),
         body: {
           attending_main_status: editMainStatus,
-          attending_after_party: editAfterPartyStatus,
           special_notes: editNotes,
           email: editEmail,
         },
@@ -172,11 +167,6 @@ export default function RsvpsPage() {
               Main: {mainFilter}
             </span>
           )}
-          {afterPartyFilter && (
-            <span className="inline-flex items-center gap-1 rounded-full bg-stone-100 px-2.5 py-1 text-xs font-medium text-stone-700">
-              After Party: {afterPartyFilter}
-            </span>
-          )}
           <button
             onClick={clearFilter}
             className="rounded px-2 py-1 text-xs text-stone-500 hover:bg-stone-100 hover:text-stone-700"
@@ -215,7 +205,6 @@ export default function RsvpsPage() {
                 <tr>
                   <th className="px-4 py-3 font-medium text-stone-600">Family</th>
                   <th className="px-4 py-3 font-medium text-stone-600">Main</th>
-                  <th className="px-4 py-3 font-medium text-stone-600">After Party</th>
                   <th className="px-4 py-3 font-medium text-stone-600">Notes</th>
                   <th className="px-4 py-3 font-medium text-stone-600">Email</th>
                   <th className="px-4 py-3 font-medium text-stone-600">Date</th>
@@ -235,9 +224,6 @@ export default function RsvpsPage() {
                     </td>
                     <td className="px-4 py-3">
                       <RsvpBadge status={rsvp.attending_main_status} />
-                    </td>
-                    <td className="px-4 py-3">
-                      <RsvpBadge status={rsvp.attending_after_party} />
                     </td>
                     <td className="px-4 py-3 max-w-xs truncate text-stone-600">
                       {rsvp.special_notes || '–'}
@@ -295,23 +281,6 @@ export default function RsvpsPage() {
               id="edit_main_status"
               value={editMainStatus}
               onChange={(e) => setEditMainStatus(e.target.value)}
-              className="w-full rounded border border-stone-300 px-3 py-2 text-sm text-stone-900 focus:border-stone-500 focus:ring-1 focus:ring-stone-500 focus:outline-none"
-            >
-              {Object.values(RSVPStatus).map((status) => (
-                <option key={status} value={status}>
-                  {status}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div className="space-y-1.5">
-            <label htmlFor="edit_after_party_status" className="block text-sm font-medium text-stone-700">
-              After Party
-            </label>
-            <select
-              id="edit_after_party_status"
-              value={editAfterPartyStatus}
-              onChange={(e) => setEditAfterPartyStatus(e.target.value)}
               className="w-full rounded border border-stone-300 px-3 py-2 text-sm text-stone-900 focus:border-stone-500 focus:ring-1 focus:ring-stone-500 focus:outline-none"
             >
               {Object.values(RSVPStatus).map((status) => (
