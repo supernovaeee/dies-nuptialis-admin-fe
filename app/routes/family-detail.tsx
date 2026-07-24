@@ -159,7 +159,7 @@ function FamilyInfoSection({ family }: { family: AdminFamilyItem }) {
               required
               value={famName}
               onChange={(e) => setFamName(e.target.value)}
-              className="w-full rounded border border-stone-300 px-3 py-1.5 text-sm focus:border-stone-500 focus:ring-1 focus:ring-stone-500 focus:outline-none"
+              className="w-full rounded border border-stone-300 px-3 py-1.5 text-sm text-stone-900 focus:border-stone-500 focus:ring-1 focus:ring-stone-500 focus:outline-none"
             />
           </div>
           <div className="space-y-1">
@@ -172,7 +172,7 @@ function FamilyInfoSection({ family }: { family: AdminFamilyItem }) {
               min={1}
               value={paxAllowed}
               onChange={(e) => setPaxAllowed(Number(e.target.value))}
-              className="w-full rounded border border-stone-300 px-3 py-1.5 text-sm focus:border-stone-500 focus:ring-1 focus:ring-stone-500 focus:outline-none"
+              className="w-full rounded border border-stone-300 px-3 py-1.5 text-sm text-stone-900 focus:border-stone-500 focus:ring-1 focus:ring-stone-500 focus:outline-none"
             />
           </div>
           <div className="flex items-center gap-2">
