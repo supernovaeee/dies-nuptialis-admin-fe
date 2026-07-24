@@ -11,6 +11,8 @@ import type { T_adminUpsertLetter } from "./api/adminUpsertLetter";
 import type { T_adminGetLetter } from "./api/adminGetLetter";
 import type { T_adminGetRsvps } from "./api/adminGetRsvps";
 import type { T_adminGetRsvpSummary } from "./api/adminGetRsvpSummary";
+import type { T_adminUpdateRsvp } from "./api/adminUpdateRsvp";
+import type { T_adminDeleteRsvp } from "./api/adminDeleteRsvp";
 import type { T_adminGetWishes } from "./api/adminGetWishes";
 import type { T_adminModerateWish } from "./api/adminModerateWish";
 import type { T_adminExportRsvp } from "./api/adminExportRsvp";
@@ -24,6 +26,8 @@ import type { T_authGuestFamily } from "./api/authGuestFamily";
 import type { T_submitRsvp } from "./api/submitRsvp";
 import type { T_getRsvp } from "./api/getRsvp";
 import type { T_submitWish } from "./api/submitWish";
+import type { T_getMyWish } from "./api/getMyWish";
+import type { T_deleteMyWish } from "./api/deleteMyWish";
 import type { T_getPublicWishes } from "./api/getPublicWishes";
 import type { T_guestGetGuests } from "./api/guestGetGuests";
 import type { T_guestAddGuest } from "./api/guestAddGuest";
@@ -112,6 +116,14 @@ export namespace AxiosClient {
     const final_url = __build_path(base_url, '/admin/rsvp-summary', {});
     return (await axios['get'](final_url, { headers: req.headers as any, })).data as any;
   }
+  export const adminUpdateRsvp: T_adminUpdateRsvp = async (req, base_url: string = BaseURL.instance.base_url) => {
+    const final_url = __build_path(base_url, '/admin/rsvps/:rsvp_id', req.path);
+    return (await axios['patch'](final_url, req.body, { headers: req.headers as any, })).data as any;
+  }
+  export const adminDeleteRsvp: T_adminDeleteRsvp = async (req, base_url: string = BaseURL.instance.base_url) => {
+    const final_url = __build_path(base_url, '/admin/rsvps/:rsvp_id', req.path);
+    return (await axios['delete'](final_url, { headers: req.headers as any, })).data as any;
+  }
   export const adminGetWishes: T_adminGetWishes = async (req, base_url: string = BaseURL.instance.base_url) => {
     const final_url = __build_path(base_url, '/admin/wishes', {});
     return (await axios['get'](final_url, { headers: req.headers as any, params: req.query as any, })).data as any;
@@ -163,6 +175,14 @@ export namespace AxiosClient {
   export const submitWish: T_submitWish = async (req, base_url: string = BaseURL.instance.base_url) => {
     const final_url = __build_path(base_url, '/wishes', {});
     return (await axios['post'](final_url, req.body, { headers: req.headers as any, })).data as any;
+  }
+  export const getMyWish: T_getMyWish = async (req, base_url: string = BaseURL.instance.base_url) => {
+    const final_url = __build_path(base_url, '/wishes/mine', {});
+    return (await axios['get'](final_url, { headers: req.headers as any, })).data as any;
+  }
+  export const deleteMyWish: T_deleteMyWish = async (req, base_url: string = BaseURL.instance.base_url) => {
+    const final_url = __build_path(base_url, '/wishes/mine', {});
+    return (await axios['delete'](final_url, { headers: req.headers as any, })).data as any;
   }
   export const getPublicWishes: T_getPublicWishes = async (req, base_url: string = BaseURL.instance.base_url) => {
     const final_url = __build_path(base_url, '/wishes', {});

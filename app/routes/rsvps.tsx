@@ -1,13 +1,19 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, type FormEvent } from 'react'
 import { Link, useSearchParams } from 'react-router'
 import { useRsvps } from '~/hooks/useRsvps'
 import { useRsvpSummary } from '~/hooks/useRsvpSummary'
 import { useExportRsvp } from '~/hooks/useExportRsvp'
+import { useUpdateRsvp } from '~/hooks/useUpdateRsvp'
+import { useDeleteRsvp } from '~/hooks/useDeleteRsvp'
 import { useToast } from '~/context/ToastContext'
 import { getApiErrorMessage } from '~/lib/apiError'
 import { ROUTES } from '~/constants'
 import { Pagination } from '~/components/ui/Pagination'
 import { EmptyState } from '~/components/ui/EmptyState'
+import { Modal } from '~/components/ui/Modal'
+import { ConfirmDialog } from '~/components/ui/ConfirmDialog'
+import { RSVPStatus } from '@api/model/enum/RSVPStatus'
+import type { AdminRsvpItem } from '@api/schema/AdminRsvpItem'
 
 const LIMIT = 50
 const FILTERED_LIMIT = 1000
@@ -23,6 +29,15 @@ export default function RsvpsPage() {
   const { data: summary, isLoading: summaryLoading } = useRsvpSummary()
   const { data, isLoading, error } = useRsvps(page, hasFilter ? FILTERED_LIMIT : LIMIT)
   const exportRsvp = useExportRsvp()
+  const updateRsvp = useUpdateRsvp()
+  const deleteRsvp = useDeleteRsvp()
+
+  const [editingRsvp, setEditingRsvp] = useState<AdminRsvpItem | null>(null)
+  const [editMainStatus, setEditMainStatus] = useState<string>(RSVPStatus.PENDING)
+  const [editAfterPartyStatus, setEditAfterPartyStatus] = useState<string>(RSVPStatus.PENDING)
+  const [editNotes, setEditNotes] = useState('')
+  const [editEmail, setEditEmail] = useState('')
+  const [deleteTarget, setDeleteTarget] = useState<AdminRsvpItem | null>(null)
 
   const filteredData = useMemo(() => {
     if (!data) return null
@@ -38,6 +53,52 @@ export default function RsvpsPage() {
   function clearFilter() {
     setSearchParams({})
     setPage(0)
+  }
+
+  function openEdit(rsvp: AdminRsvpItem) {
+    setEditingRsvp(rsvp)
+    setEditMainStatus(rsvp.attending_main_status)
+    setEditAfterPartyStatus(rsvp.attending_after_party)
+    setEditNotes(rsvp.special_notes ?? '')
+    setEditEmail(rsvp.email ?? '')
+  }
+
+  function handleUpdateRsvp(e: FormEvent) {
+    e.preventDefault()
+    if (!editingRsvp) return
+    updateRsvp.mutate(
+      {
+        rsvpId: String(editingRsvp.id),
+        body: {
+          attending_main_status: editMainStatus,
+          attending_after_party: editAfterPartyStatus,
+          special_notes: editNotes,
+          email: editEmail,
+        },
+      },
+      {
+        onSuccess: () => {
+          toast.success('RSVP updated')
+          setEditingRsvp(null)
+        },
+        onError: (err) => {
+          toast.error(getApiErrorMessage(err, 'Failed to update RSVP'))
+        },
+      },
+    )
+  }
+
+  function handleDeleteRsvp() {
+    if (!deleteTarget) return
+    deleteRsvp.mutate(String(deleteTarget.id), {
+      onSuccess: () => {
+        toast.success('RSVP deleted')
+        setDeleteTarget(null)
+      },
+      onError: (err) => {
+        toast.error(getApiErrorMessage(err, 'Failed to delete RSVP'))
+      },
+    })
   }
 
   function handleExport() {
@@ -158,6 +219,7 @@ export default function RsvpsPage() {
                   <th className="px-4 py-3 font-medium text-stone-600">Notes</th>
                   <th className="px-4 py-3 font-medium text-stone-600">Email</th>
                   <th className="px-4 py-3 font-medium text-stone-600">Date</th>
+                  <th className="px-4 py-3 font-medium text-stone-600" />
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-100">
@@ -186,6 +248,22 @@ export default function RsvpsPage() {
                     <td className="px-4 py-3 text-stone-500 text-xs">
                       {new Date(rsvp.submitted_at).toLocaleDateString()}
                     </td>
+                    <td className="px-4 py-3">
+                      <div className="flex justify-end gap-1">
+                        <button
+                          onClick={() => openEdit(rsvp)}
+                          className="rounded px-2 py-1 text-xs text-stone-600 hover:bg-stone-100"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => setDeleteTarget(rsvp)}
+                          className="rounded px-2 py-1 text-xs text-red-600 hover:bg-red-50"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -202,6 +280,99 @@ export default function RsvpsPage() {
           )}
         </>
       )}
+
+      <Modal
+        open={!!editingRsvp}
+        onClose={() => setEditingRsvp(null)}
+        title="Edit RSVP"
+      >
+        <form onSubmit={handleUpdateRsvp} className="space-y-4">
+          <div className="space-y-1.5">
+            <label htmlFor="edit_main_status" className="block text-sm font-medium text-stone-700">
+              Main Event
+            </label>
+            <select
+              id="edit_main_status"
+              value={editMainStatus}
+              onChange={(e) => setEditMainStatus(e.target.value)}
+              className="w-full rounded border border-stone-300 px-3 py-2 text-sm text-stone-900 focus:border-stone-500 focus:ring-1 focus:ring-stone-500 focus:outline-none"
+            >
+              {Object.values(RSVPStatus).map((status) => (
+                <option key={status} value={status}>
+                  {status}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="space-y-1.5">
+            <label htmlFor="edit_after_party_status" className="block text-sm font-medium text-stone-700">
+              After Party
+            </label>
+            <select
+              id="edit_after_party_status"
+              value={editAfterPartyStatus}
+              onChange={(e) => setEditAfterPartyStatus(e.target.value)}
+              className="w-full rounded border border-stone-300 px-3 py-2 text-sm text-stone-900 focus:border-stone-500 focus:ring-1 focus:ring-stone-500 focus:outline-none"
+            >
+              {Object.values(RSVPStatus).map((status) => (
+                <option key={status} value={status}>
+                  {status}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="space-y-1.5">
+            <label htmlFor="edit_email" className="block text-sm font-medium text-stone-700">
+              Email
+            </label>
+            <input
+              id="edit_email"
+              type="email"
+              value={editEmail}
+              onChange={(e) => setEditEmail(e.target.value)}
+              className="w-full rounded border border-stone-300 px-3 py-2 text-sm text-stone-900 focus:border-stone-500 focus:ring-1 focus:ring-stone-500 focus:outline-none"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label htmlFor="edit_notes" className="block text-sm font-medium text-stone-700">
+              Notes
+            </label>
+            <textarea
+              id="edit_notes"
+              rows={3}
+              value={editNotes}
+              onChange={(e) => setEditNotes(e.target.value)}
+              className="w-full rounded border border-stone-300 px-3 py-2 text-sm text-stone-900 focus:border-stone-500 focus:ring-1 focus:ring-stone-500 focus:outline-none"
+            />
+          </div>
+          <div className="flex justify-end gap-3">
+            <button
+              type="button"
+              onClick={() => setEditingRsvp(null)}
+              className="rounded border border-stone-300 px-3 py-1.5 text-sm text-stone-700 hover:bg-stone-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={updateRsvp.isPending}
+              className="rounded bg-stone-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-stone-800 disabled:opacity-50"
+            >
+              {updateRsvp.isPending ? 'Saving...' : 'Save'}
+            </button>
+          </div>
+        </form>
+      </Modal>
+
+      <ConfirmDialog
+        open={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={handleDeleteRsvp}
+        title="Delete RSVP"
+        description={`Delete the RSVP submitted by "${deleteTarget?.fam_name}"? This cannot be undone.`}
+        confirmLabel="Delete"
+        loading={deleteRsvp.isPending}
+      />
     </div>
   )
 }
