@@ -13,7 +13,7 @@ import { ConfirmDialog } from '~/components/ui/ConfirmDialog'
 import { EmptyState } from '~/components/ui/EmptyState'
 import { ImageCropper } from '~/components/ui/ImageCropper'
 import { RichTextEditor } from '~/components/ui/RichTextEditor'
-import type { CarouselCardItem } from '@api/schema/CarouselCardItem'
+import type { AdminCarouselCardItem } from '@api/schema/AdminCarouselCardItem'
 
 export default function CarouselPage() {
   const toast = useToast()
@@ -21,11 +21,14 @@ export default function CarouselPage() {
   const reorder = useReorderCarouselCards()
 
   const [showCreate, setShowCreate] = useState(false)
-  const [editTarget, setEditTarget] = useState<CarouselCardItem | null>(null)
-  const [deleteTarget, setDeleteTarget] = useState<CarouselCardItem | null>(
+  const [editTarget, setEditTarget] = useState<AdminCarouselCardItem | null>(
+    null,
+  )
+  const [deleteTarget, setDeleteTarget] = useState<AdminCarouselCardItem | null>(
     null,
   )
   const deleteCard = useDeleteCarouselCard()
+  const updateCard = useUpdateCarouselCard()
 
   const cards = data?.data
     ? [...data.data].sort((a, b) => a.sort_order - b.sort_order)
@@ -44,6 +47,19 @@ export default function CarouselPage() {
       onError: (err) =>
         toast.error(getApiErrorMessage(err, 'Failed to reorder')),
     })
+  }
+
+  function handleToggleArchive(card: AdminCarouselCardItem) {
+    updateCard.mutate(
+      { cardId: String(card.id), body: { archived: !card.archived } },
+      {
+        onSuccess: () => {
+          toast.success(card.archived ? 'Card unarchived' : 'Card archived')
+        },
+        onError: (err) =>
+          toast.error(getApiErrorMessage(err, 'Failed to update card')),
+      },
+    )
   }
 
   function handleDelete() {
@@ -104,19 +120,28 @@ export default function CarouselPage() {
           {cards.map((card, idx) => (
             <div
               key={card.id}
-              className="flex flex-col rounded-lg border border-stone-200 bg-white overflow-hidden"
+              className={`flex flex-col rounded-lg border border-stone-200 bg-white overflow-hidden ${
+                card.archived ? 'opacity-60' : ''
+              }`}
             >
-              {card.image_url ? (
-                <img
-                  src={card.image_url}
-                  alt={card.title ?? ''}
-                  className="h-36 w-full object-cover"
-                />
-              ) : (
-                <div className="flex h-36 items-center justify-center bg-stone-100 text-sm text-stone-400">
-                  No image
-                </div>
-              )}
+              <div className="relative">
+                {card.image_url ? (
+                  <img
+                    src={card.image_url}
+                    alt={card.title ?? ''}
+                    className="h-36 w-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-36 items-center justify-center bg-stone-100 text-sm text-stone-400">
+                    No image
+                  </div>
+                )}
+                {card.archived && (
+                  <span className="absolute left-2 top-2 rounded bg-stone-900/80 px-2 py-0.5 text-xs font-medium text-white">
+                    Archived
+                  </span>
+                )}
+              </div>
 
               <div className="flex flex-1 flex-col p-4">
                 <h3 className="text-sm font-medium text-stone-900">
@@ -156,6 +181,13 @@ export default function CarouselPage() {
                       className="rounded px-2 py-1 text-xs text-stone-600 hover:bg-stone-100"
                     >
                       Edit
+                    </button>
+                    <button
+                      onClick={() => handleToggleArchive(card)}
+                      disabled={updateCard.isPending}
+                      className="rounded px-2 py-1 text-xs text-stone-600 hover:bg-stone-100 disabled:opacity-50"
+                    >
+                      {card.archived ? 'Unarchive' : 'Archive'}
                     </button>
                     <button
                       onClick={() => setDeleteTarget(card)}
@@ -207,7 +239,7 @@ function CardFormModal({
   open: boolean
   onClose: () => void
   mode: 'create' | 'edit'
-  card?: CarouselCardItem
+  card?: AdminCarouselCardItem
 }) {
   const toast = useToast()
   const createCard = useCreateCarouselCard()

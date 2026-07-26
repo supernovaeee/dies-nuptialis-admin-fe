@@ -21,6 +21,10 @@ import type { T_adminCreateCarouselCard } from "./api/adminCreateCarouselCard";
 import type { T_adminReorderCarouselCards } from "./api/adminReorderCarouselCards";
 import type { T_adminUpdateCarouselCard } from "./api/adminUpdateCarouselCard";
 import type { T_adminDeleteCarouselCard } from "./api/adminDeleteCarouselCard";
+import type { T_adminGetFaqs } from "./api/adminGetFaqs";
+import type { T_adminCreateFaq } from "./api/adminCreateFaq";
+import type { T_adminUpdateFaq } from "./api/adminUpdateFaq";
+import type { T_adminDeleteFaq } from "./api/adminDeleteFaq";
 import type { T_adminUploadImage } from "./api/adminUploadImage";
 import type { T_authGuestFamily } from "./api/authGuestFamily";
 import type { T_submitRsvp } from "./api/submitRsvp";
@@ -34,6 +38,7 @@ import type { T_guestAddGuest } from "./api/guestAddGuest";
 import type { T_guestUpdateGuest } from "./api/guestUpdateGuest";
 import type { T_guestDeleteGuest } from "./api/guestDeleteGuest";
 import type { T_getCarouselCards } from "./api/getCarouselCards";
+import type { T_getFaqs } from "./api/getFaqs";
 
 export type OnMessage<T> = (chunk: T, is_complete: boolean) => void;
 export interface StreamResponse<T> {
@@ -156,6 +161,22 @@ export namespace AxiosClient {
     const final_url = __build_path(base_url, '/admin/carousel-cards/:card_id', req.path);
     return (await axios['delete'](final_url, { headers: req.headers as any, })).data as any;
   }
+  export const adminGetFaqs: T_adminGetFaqs = async (req, base_url: string = BaseURL.instance.base_url) => {
+    const final_url = __build_path(base_url, '/admin/faqs', {});
+    return (await axios['get'](final_url, { headers: req.headers as any, })).data as any;
+  }
+  export const adminCreateFaq: T_adminCreateFaq = async (req, base_url: string = BaseURL.instance.base_url) => {
+    const final_url = __build_path(base_url, '/admin/faqs', {});
+    return (await axios['post'](final_url, req.body, { headers: req.headers as any, })).data as any;
+  }
+  export const adminUpdateFaq: T_adminUpdateFaq = async (req, base_url: string = BaseURL.instance.base_url) => {
+    const final_url = __build_path(base_url, '/admin/faqs/:faq_id', req.path);
+    return (await axios['patch'](final_url, req.body, { headers: req.headers as any, })).data as any;
+  }
+  export const adminDeleteFaq: T_adminDeleteFaq = async (req, base_url: string = BaseURL.instance.base_url) => {
+    const final_url = __build_path(base_url, '/admin/faqs/:faq_id', req.path);
+    return (await axios['delete'](final_url, { headers: req.headers as any, })).data as any;
+  }
   export const adminUploadImage: T_adminUploadImage = async (req, base_url: string = BaseURL.instance.base_url) => {
     const final_url = __build_path(base_url, '/admin/upload/image', {});
     return (await axios['post'](final_url, req.body, { headers: req.headers as any, })).data as any;
@@ -206,6 +227,10 @@ export namespace AxiosClient {
   }
   export const getCarouselCards: T_getCarouselCards = async (req, base_url: string = BaseURL.instance.base_url) => {
     const final_url = __build_path(base_url, '/carousel-cards', {});
+    return (await axios['get'](final_url, { })).data as any;
+  }
+  export const getFaqs: T_getFaqs = async (req, base_url: string = BaseURL.instance.base_url) => {
+    const final_url = __build_path(base_url, '/faqs', {});
     return (await axios['get'](final_url, { })).data as any;
   }
 }

@@ -8,6 +8,7 @@ export const ROUTES = {
   RSVPS: '/rsvps',
   WISHES: '/wishes',
   CAROUSEL: '/carousel',
+  FAQ: '/faq',
 } as const
 
 export const QUERY_KEYS = {
@@ -17,4 +18,5 @@ export const QUERY_KEYS = {
   RSVP_SUMMARY: ['rsvp-summary'] as const,
   WISHES: (page: number, status?: string) => ['wishes', page, status] as const,
   CAROUSEL_CARDS: ['carousel-cards'] as const,
+  FAQS: ['faqs'] as const,
 } as const

@@ -1,5 +1,5 @@
 
-import type { CarouselCardItem } from '../schema/CarouselCardItem'
+import type { AdminCarouselCardItem } from '../schema/AdminCarouselCardItem'
 
 export interface T_adminUpdateCarouselCard_headers {
   authorization: string
@@ -12,6 +12,7 @@ export interface T_adminUpdateCarouselCard_body {
   image_url?: string
   content?: string
   sort_order?: number
+  archived?: boolean
 }
 
 
@@ -20,7 +21,7 @@ export type T_adminUpdateCarouselCard = (request: {
   headers: T_adminUpdateCarouselCard_headers
   path: T_adminUpdateCarouselCard_path
   body: T_adminUpdateCarouselCard_body
-}, base_url?: string) => Promise<CarouselCardItem>;
+}, base_url?: string) => Promise<AdminCarouselCardItem>;
 
 export const method = 'patch';
 export const url_path = '/admin/carousel-cards/:card_id';

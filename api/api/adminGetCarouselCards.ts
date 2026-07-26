@@ -1,5 +1,5 @@
 
-import type { CarouselCardList } from '../schema/CarouselCardList'
+import type { AdminCarouselCardList } from '../schema/AdminCarouselCardList'
 
 export interface T_adminGetCarouselCards_headers {
   authorization: string
@@ -9,7 +9,7 @@ export interface T_adminGetCarouselCards_headers {
 
 export type T_adminGetCarouselCards = (request: {
   headers: T_adminGetCarouselCards_headers
-}, base_url?: string) => Promise<CarouselCardList>;
+}, base_url?: string) => Promise<AdminCarouselCardList>;
 
 export const method = 'get';
 export const url_path = '/admin/carousel-cards';

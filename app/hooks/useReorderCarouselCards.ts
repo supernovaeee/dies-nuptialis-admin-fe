@@ -1,13 +1,13 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { AxiosClient } from '@api/AxiosClient'
-import type { CarouselCardList } from '@api/schema/CarouselCardList'
+import type { AdminCarouselCardList } from '@api/schema/AdminCarouselCardList'
 import { QUERY_KEYS } from '~/constants'
 import { AUTH_HEADER } from '~/lib/authHeader'
 
 export function useReorderCarouselCards() {
   const queryClient = useQueryClient()
 
-  return useMutation<CarouselCardList, unknown, number[]>({
+  return useMutation<AdminCarouselCardList, unknown, number[]>({
     mutationFn: (order) =>
       AxiosClient.adminReorderCarouselCards({
         headers: AUTH_HEADER,

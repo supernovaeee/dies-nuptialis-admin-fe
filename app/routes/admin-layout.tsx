@@ -8,6 +8,7 @@ const NAV_ITEMS = [
   { to: ROUTES.RSVPS, label: 'RSVPs' },
   { to: ROUTES.WISHES, label: 'Wishes' },
   { to: ROUTES.CAROUSEL, label: 'Carousel' },
+  { to: ROUTES.FAQ, label: 'FAQ' },
 ] as const
 
 export default function AdminLayout() {

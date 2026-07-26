@@ -9,5 +9,6 @@ export default [
     route("rsvps", "routes/rsvps.tsx"),
     route("wishes", "routes/wishes.tsx"),
     route("carousel", "routes/carousel.tsx"),
+    route("faq", "routes/faq.tsx"),
   ]),
 ] satisfies RouteConfig;

@@ -1,5 +1,5 @@
 
-import type { CarouselCardList } from '../schema/CarouselCardList'
+import type { AdminCarouselCardList } from '../schema/AdminCarouselCardList'
 
 export interface T_adminReorderCarouselCards_headers {
   authorization: string
@@ -13,7 +13,7 @@ export interface T_adminReorderCarouselCards_body {
 export type T_adminReorderCarouselCards = (request: {
   headers: T_adminReorderCarouselCards_headers
   body: T_adminReorderCarouselCards_body
-}, base_url?: string) => Promise<CarouselCardList>;
+}, base_url?: string) => Promise<AdminCarouselCardList>;
 
 export const method = 'patch';
 export const url_path = '/admin/carousel-cards/reorder';

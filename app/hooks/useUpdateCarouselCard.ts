@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { AxiosClient } from '@api/AxiosClient'
 import type { T_adminUpdateCarouselCard_body } from '@api/api/adminUpdateCarouselCard'
-import type { CarouselCardItem } from '@api/schema/CarouselCardItem'
+import type { AdminCarouselCardItem } from '@api/schema/AdminCarouselCardItem'
 import { QUERY_KEYS } from '~/constants'
 import { AUTH_HEADER } from '~/lib/authHeader'
 
@@ -13,7 +13,7 @@ interface UpdateCarouselCardVars {
 export function useUpdateCarouselCard() {
   const queryClient = useQueryClient()
 
-  return useMutation<CarouselCardItem, unknown, UpdateCarouselCardVars>({
+  return useMutation<AdminCarouselCardItem, unknown, UpdateCarouselCardVars>({
     mutationFn: ({ cardId, body }) =>
       AxiosClient.adminUpdateCarouselCard({
         headers: AUTH_HEADER,
