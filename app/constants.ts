@@ -1,5 +1,7 @@
 export const TOKEN_KEY = 'dies_admin_token'
 
+export const GUEST_SITE_URL = 'https://amity.azzamarcel.com'
+
 export const ROUTES = {
   LOGIN: '/login',
   DASHBOARD: '/',
