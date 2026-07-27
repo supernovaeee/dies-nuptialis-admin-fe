@@ -15,12 +15,29 @@ function fileToBase64(file: File): Promise<string> {
   })
 }
 
+// Maps BlockNote's textAlignment values to a flexbox justify-content value.
+// A flex wrapper is used (rather than `text-align`) because Tailwind's
+// preflight reset sets `img { display: block }` — text-align only centers
+// inline content, so it's a no-op against a block-level <img>. justify-content
+// centers a block-level flex item just fine.
+const JUSTIFY_BY_ALIGNMENT: Record<string, string> = {
+  left: 'flex-start',
+  center: 'center',
+  right: 'flex-end',
+  justify: 'flex-start',
+}
+const ALIGNMENT_BY_JUSTIFY: Record<string, string> = {
+  'flex-start': 'left',
+  center: 'center',
+  'flex-end': 'right',
+}
+
 // BlockNote's built-in image block tracks a `textAlignment` prop (set via the
 // block toolbar), but its `toExternalHTML` implementation — unlike paragraph,
 // heading, quote, and list-item blocks — never writes that alignment onto the
 // serialized element. blocksToHTMLLossy() silently drops it, so every saved
 // image renders left-aligned regardless of what was picked in the editor.
-// Work around the upstream gap by re-applying alignment as an inline style
+// Work around the upstream gap by re-applying alignment as a wrapper div
 // after serialization, matching images back to their block by `src` url.
 function applyImageAlignment(html: string, blocks: Block[]): string {
   const alignmentByUrl = new Map<string, string>()
@@ -47,7 +64,10 @@ function applyImageAlignment(html: string, blocks: Block[]): string {
     if (!align) return
     const target = img.closest('figure') ?? img
     const wrapper = doc.createElement('div')
-    wrapper.style.textAlign = align
+    wrapper.setAttribute(
+      'style',
+      `display: flex; justify-content: ${JUSTIFY_BY_ALIGNMENT[align] ?? 'flex-start'};`,
+    )
     target.replaceWith(wrapper)
     wrapper.appendChild(target)
   })
@@ -58,14 +78,14 @@ function applyImageAlignment(html: string, blocks: Block[]): string {
 // block parser (imageParse in @blocknote/core) reads backgroundColor off a
 // parsed <img>/<figure> but never textAlignment, so re-opening saved HTML
 // would otherwise reset every aligned image back to "left" in the editor.
-// Recover the alignment from our `<div style="text-align:...">` wrapper
-// (keyed by `src`) and patch it onto the parsed blocks before seeding.
+// Recover the alignment from our flex wrapper div (keyed by `src`) and patch
+// it onto the parsed blocks before seeding.
 function extractImageAlignments(html: string): Map<string, string> {
   const alignmentByUrl = new Map<string, string>()
   const doc = new DOMParser().parseFromString(html, 'text/html')
-  doc.querySelectorAll('div[style*="text-align"]').forEach((div) => {
+  doc.querySelectorAll('div[style*="justify-content"]').forEach((div) => {
     if (!(div instanceof HTMLElement)) return
-    const align = div.style.textAlign
+    const align = ALIGNMENT_BY_JUSTIFY[div.style.justifyContent]
     const src = div.querySelector('img')?.getAttribute('src')
     if (align && src) alignmentByUrl.set(src, align)
   })
