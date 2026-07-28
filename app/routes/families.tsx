@@ -59,6 +59,15 @@ export default function FamiliesPage() {
     }
   }
 
+  async function handleCopyMessage(family: AdminFamilyItem) {
+    try {
+      await navigator.clipboard.writeText(buildInviteMessage(family))
+      toast.success('Invite message copied to clipboard')
+    } catch {
+      toast.error('Failed to copy message')
+    }
+  }
+
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
@@ -232,6 +241,22 @@ export default function FamiliesPage() {
                         </svg>
                         Copy Link
                       </button>
+                      <button
+                        onClick={() => handleCopyMessage(family)}
+                        className="flex items-center gap-1 rounded px-2 py-1 text-xs text-stone-600 hover:bg-stone-100"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                          className="h-3.5 w-3.5"
+                          aria-hidden="true"
+                        >
+                          <path d="M2 3.5A1.5 1.5 0 0 1 3.5 2h9A1.5 1.5 0 0 1 14 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 12.5v-9Z" />
+                          <path d="M6 6.5a1.5 1.5 0 0 1 1.5-1.5h9A1.5 1.5 0 0 1 18 6.5v9a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 6 15.5v-9Z" />
+                        </svg>
+                        Copy Message
+                      </button>
                       <span className="mx-1 h-4 w-px bg-stone-200" />
                       <button
                         onClick={() => setDeleteTarget(family)}
@@ -263,6 +288,32 @@ export default function FamiliesPage() {
       />
     </div>
   )
+}
+
+function buildInviteMessage(family: AdminFamilyItem): string {
+  const link = `${GUEST_SITE_URL}/${family.invite_code}`
+  return `Dear ${family.fam_name},
+
+It is with great joy and honor that we invite you to our wedding.
+
+As we stand before God to make our sacred vows to one another, we would be overjoyed to have you there standing at the pews to witness and celebrate this special day with us.
+
+So, allow us to invite you to our holy matrimony and garden reception on:
+
+🗓️ Saturday, November 7, 2026
+🕝 2.45 PM
+📍⛪️ Armenian Church of St. Gregory the Illuminator, 60 Hill St, Singapore
+
+You may visit the unique link below for RSVP and further event details:
+
+${link}
+
+Kindly RSVP by 07 August 2026.
+
+We hope to see you at the pews!
+
+With love,
+Azza & Marcel`
 }
 
 function StatusBadge({ active }: { active: boolean }) {
