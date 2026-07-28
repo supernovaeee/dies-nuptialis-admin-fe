@@ -13,6 +13,7 @@ import { ROUTES } from '~/constants'
 import { Modal } from '~/components/ui/Modal'
 import { ConfirmDialog } from '~/components/ui/ConfirmDialog'
 import { RichTextEditor } from '~/components/ui/RichTextEditor'
+import { InviteActionButtons } from '~/components/InviteActionButtons'
 import type { AdminFamilyItem } from '@api/schema/AdminFamilyItem'
 import type { GuestItem } from '@api/schema/GuestItem'
 
@@ -73,12 +74,16 @@ export default function FamilyDetailPage() {
           <h1 className="mt-1 text-lg font-medium text-stone-900">{family.fam_name}</h1>
           <p className="font-mono text-xs text-stone-400">{family.invite_code}</p>
         </div>
-        <button
-          onClick={() => setShowDeleteConfirm(true)}
-          className="rounded border border-red-300 px-3 py-1.5 text-sm text-red-600 hover:bg-red-50"
-        >
-          Delete Family
-        </button>
+        <div className="flex items-center gap-1">
+          <InviteActionButtons family={family} />
+          <span className="mx-1 h-4 w-px bg-stone-200" />
+          <button
+            onClick={() => setShowDeleteConfirm(true)}
+            className="rounded border border-red-300 px-3 py-1.5 text-sm text-red-600 hover:bg-red-50"
+          >
+            Delete Family
+          </button>
+        </div>
       </div>
 
       <FamilyInfoSection family={family} />
