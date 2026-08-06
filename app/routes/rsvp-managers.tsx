@@ -116,7 +116,7 @@ export default function RsvpManagersPage() {
                     onClick={() => setEditTarget(manager)}
                     className="rounded px-2 py-1 text-xs text-stone-600 hover:bg-stone-100"
                   >
-                    Edit
+                    Message Template
                   </button>
                   <button
                     onClick={() => setDeleteTarget(manager)}
@@ -154,7 +154,7 @@ export default function RsvpManagersPage() {
                           onClick={() => setEditTarget(manager)}
                           className="rounded px-2 py-1 text-xs text-stone-600 hover:bg-stone-100"
                         >
-                          Edit
+                          Message Template
                         </button>
                         <button
                           onClick={() => setDeleteTarget(manager)}
@@ -176,7 +176,7 @@ export default function RsvpManagersPage() {
 
       <CreateRsvpManagerModal open={showCreate} onClose={() => setShowCreate(false)} />
 
-      <EditRsvpManagerModal manager={editTarget} onClose={() => setEditTarget(null)} />
+      <MessageTemplateModal manager={editTarget} onClose={() => setEditTarget(null)} />
 
       <ConfirmDialog
         open={!!deleteTarget}
@@ -202,7 +202,7 @@ function MessageField({
   return (
     <div className="space-y-1.5">
       <label htmlFor={id} className="block text-sm font-medium text-stone-700">
-        Copy message template
+        Message Template
       </label>
       <textarea
         id={id}
@@ -286,7 +286,7 @@ function CreateRsvpManagerModal({ open, onClose }: { open: boolean; onClose: () 
   )
 }
 
-function EditRsvpManagerModal({
+function MessageTemplateModal({
   manager,
   onClose,
 }: {
@@ -295,12 +295,10 @@ function EditRsvpManagerModal({
 }) {
   const toast = useToast()
   const updateManager = useUpdateRsvpManager()
-  const [name, setName] = useState('')
   const [message, setMessage] = useState('')
 
   useEffect(() => {
     if (manager) {
-      setName(manager.name)
       setMessage(manager.message ?? '')
     }
   }, [manager])
@@ -309,37 +307,23 @@ function EditRsvpManagerModal({
     e.preventDefault()
     if (!manager) return
     updateManager.mutate(
-      { managerId: String(manager.id), body: { name, message } },
+      { managerId: String(manager.id), body: { message } },
       {
         onSuccess: () => {
-          toast.success('RSVP manager updated')
+          toast.success('Message template updated')
           onClose()
         },
         onError: (err) => {
-          toast.error(getApiErrorMessage(err, 'Failed to update RSVP manager'))
+          toast.error(getApiErrorMessage(err, 'Failed to update message template'))
         },
       },
     )
   }
 
   return (
-    <Modal open={!!manager} onClose={onClose} title="Edit RSVP Manager">
+    <Modal open={!!manager} onClose={onClose} title={`Message Template — ${manager?.name ?? ''}`}>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="space-y-1.5">
-          <label htmlFor="edit_manager_name" className="block text-sm font-medium text-stone-700">
-            Name *
-          </label>
-          <input
-            id="edit_manager_name"
-            type="text"
-            required
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="w-full rounded border border-stone-300 px-3 py-2 text-sm text-stone-900 focus:border-stone-500 focus:ring-1 focus:ring-stone-500 focus:outline-none"
-          />
-        </div>
-
-        <MessageField id="edit_manager_message" value={message} onChange={setMessage} />
+        <MessageField id="manager_message_template" value={message} onChange={setMessage} />
 
         <div className="flex justify-end gap-3 pt-2">
           <button
