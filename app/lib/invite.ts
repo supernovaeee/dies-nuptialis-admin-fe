@@ -17,7 +17,7 @@ It is with great joy and honor that we invite you to our wedding.
 
 As we stand before God to make our sacred vows to one another, we would be overjoyed to have you there standing at the pews to witness and celebrate this special day with us.
 
-So, allow us to invite you to our holy matrimony and garden reception on:
+So, allow us to invite you to our Holy Matrimony and Garden Reception on:
 
 🗓️ Saturday, November 7, 2026
 🕝 2.45 PM
@@ -27,7 +27,7 @@ You may visit the unique link below for RSVP and further event details:
 
 ${link}
 
-Kindly RSVP by 07 August 2026.
+Kindly RSVP by 07 September 2026.
 
 We hope to see you at the pews!
 
