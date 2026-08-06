@@ -1,10 +1,13 @@
 import { Navigate, Outlet } from 'react-router'
 import { useManagerAuth } from '~/context/ManagerAuthContext'
-import { MANAGER_TOKEN_KEY, ROUTES } from '~/constants'
+import { ROUTES } from '~/constants'
 
 export default function ManagerLayout() {
-  const token = localStorage.getItem(MANAGER_TOKEN_KEY)
-  if (!token) return <Navigate to={ROUTES.MANAGER_LOGIN} replace />
+  // Reads through context (not a raw localStorage.getItem) so that calling
+  // logout() re-renders this guard immediately instead of leaving stale
+  // content on screen until an unrelated re-render happens to pick it up.
+  const { isAuthenticated } = useManagerAuth()
+  if (!isAuthenticated) return <Navigate to={ROUTES.MANAGER_LOGIN} replace />
 
   return (
     <div className="min-h-screen bg-stone-50">
