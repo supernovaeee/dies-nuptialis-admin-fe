@@ -9,6 +9,7 @@ export interface T_adminUpdateRsvpManager_path {
 }
 export interface T_adminUpdateRsvpManager_body {
   name?: string
+  message?: string
   regenerate_passcode?: boolean
 }
 

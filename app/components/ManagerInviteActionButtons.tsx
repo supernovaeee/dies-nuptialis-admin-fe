@@ -1,7 +1,7 @@
 import { useCopyManagerInvite } from '~/hooks/useCopyManagerInvite'
 
 interface ManagerInviteActionButtonsProps {
-  manager: { name: string; passcode: string }
+  manager: { name: string; passcode: string; message?: string }
   className?: string
 }
 

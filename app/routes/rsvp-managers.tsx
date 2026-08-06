@@ -1,6 +1,7 @@
-import { useState, type FormEvent } from 'react'
+import { useState, useEffect, type FormEvent } from 'react'
 import { useRsvpManagers } from '~/hooks/useRsvpManagers'
 import { useCreateRsvpManager } from '~/hooks/useCreateRsvpManager'
+import { useUpdateRsvpManager } from '~/hooks/useUpdateRsvpManager'
 import { useDeleteRsvpManager } from '~/hooks/useDeleteRsvpManager'
 import { useDebounce } from '~/hooks/useDebounce'
 import { useToast } from '~/context/ToastContext'
@@ -22,6 +23,7 @@ export default function RsvpManagersPage() {
   const { data, isLoading, error } = useRsvpManagers(debouncedSearch || undefined, page, LIMIT)
 
   const [showCreate, setShowCreate] = useState(false)
+  const [editTarget, setEditTarget] = useState<AdminRsvpManagerItem | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<AdminRsvpManagerItem | null>(null)
   const deleteManager = useDeleteRsvpManager()
 
@@ -118,6 +120,12 @@ export default function RsvpManagersPage() {
                         <ManagerInviteActionButtons manager={manager} />
                         <span className="mx-1 h-4 w-px bg-stone-200" />
                         <button
+                          onClick={() => setEditTarget(manager)}
+                          className="rounded px-2 py-1 text-xs text-stone-600 hover:bg-stone-100"
+                        >
+                          Edit
+                        </button>
+                        <button
                           onClick={() => setDeleteTarget(manager)}
                           className="rounded px-2 py-1 text-xs text-red-600 hover:bg-red-50"
                         >
@@ -137,6 +145,8 @@ export default function RsvpManagersPage() {
 
       <CreateRsvpManagerModal open={showCreate} onClose={() => setShowCreate(false)} />
 
+      <EditRsvpManagerModal manager={editTarget} onClose={() => setEditTarget(null)} />
+
       <ConfirmDialog
         open={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
@@ -149,19 +159,52 @@ export default function RsvpManagersPage() {
   )
 }
 
+function MessageField({
+  id,
+  value,
+  onChange,
+}: {
+  id: string
+  value: string
+  onChange: (value: string) => void
+}) {
+  return (
+    <div className="space-y-1.5">
+      <label htmlFor={id} className="block text-sm font-medium text-stone-700">
+        Copy message template
+      </label>
+      <textarea
+        id={id}
+        rows={5}
+        placeholder={"Hi {{name}},\n\nYou can view the RSVP status of the guests under your name here:\n\n{{link}}"}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className="w-full rounded border border-stone-300 px-3 py-2 text-sm text-stone-900 focus:border-stone-500 focus:ring-1 focus:ring-stone-500 focus:outline-none"
+      />
+      <p className="text-xs text-stone-500">
+        Used by the "Copy Message" button. Leave blank to use the default message. Use{' '}
+        <code className="rounded bg-stone-100 px-1">{'{{name}}'}</code> and{' '}
+        <code className="rounded bg-stone-100 px-1">{'{{link}}'}</code> as placeholders.
+      </p>
+    </div>
+  )
+}
+
 function CreateRsvpManagerModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const toast = useToast()
   const createManager = useCreateRsvpManager()
   const [name, setName] = useState('')
+  const [message, setMessage] = useState('')
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault()
     createManager.mutate(
-      { name },
+      { name, ...(message.trim() && { message: message.trim() }) },
       {
         onSuccess: () => {
           toast.success('RSVP manager created')
           setName('')
+          setMessage('')
           onClose()
         },
         onError: (err) => {
@@ -189,6 +232,8 @@ function CreateRsvpManagerModal({ open, onClose }: { open: boolean; onClose: () 
           />
         </div>
 
+        <MessageField id="manager_message" value={message} onChange={setMessage} />
+
         <div className="flex justify-end gap-3 pt-2">
           <button
             type="button"
@@ -203,6 +248,82 @@ function CreateRsvpManagerModal({ open, onClose }: { open: boolean; onClose: () 
             className="rounded bg-stone-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-stone-800 disabled:opacity-50"
           >
             {createManager.isPending ? 'Creating...' : 'Create'}
+          </button>
+        </div>
+      </form>
+    </Modal>
+  )
+}
+
+function EditRsvpManagerModal({
+  manager,
+  onClose,
+}: {
+  manager: AdminRsvpManagerItem | null
+  onClose: () => void
+}) {
+  const toast = useToast()
+  const updateManager = useUpdateRsvpManager()
+  const [name, setName] = useState('')
+  const [message, setMessage] = useState('')
+
+  useEffect(() => {
+    if (manager) {
+      setName(manager.name)
+      setMessage(manager.message ?? '')
+    }
+  }, [manager])
+
+  function handleSubmit(e: FormEvent) {
+    e.preventDefault()
+    if (!manager) return
+    updateManager.mutate(
+      { managerId: String(manager.id), body: { name, message } },
+      {
+        onSuccess: () => {
+          toast.success('RSVP manager updated')
+          onClose()
+        },
+        onError: (err) => {
+          toast.error(getApiErrorMessage(err, 'Failed to update RSVP manager'))
+        },
+      },
+    )
+  }
+
+  return (
+    <Modal open={!!manager} onClose={onClose} title="Edit RSVP Manager">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-1.5">
+          <label htmlFor="edit_manager_name" className="block text-sm font-medium text-stone-700">
+            Name *
+          </label>
+          <input
+            id="edit_manager_name"
+            type="text"
+            required
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="w-full rounded border border-stone-300 px-3 py-2 text-sm text-stone-900 focus:border-stone-500 focus:ring-1 focus:ring-stone-500 focus:outline-none"
+          />
+        </div>
+
+        <MessageField id="edit_manager_message" value={message} onChange={setMessage} />
+
+        <div className="flex justify-end gap-3 pt-2">
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded border border-stone-300 px-3 py-1.5 text-sm text-stone-700 hover:bg-stone-50"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            disabled={updateManager.isPending}
+            className="rounded bg-stone-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-stone-800 disabled:opacity-50"
+          >
+            {updateManager.isPending ? 'Saving...' : 'Save'}
           </button>
         </div>
       </form>
