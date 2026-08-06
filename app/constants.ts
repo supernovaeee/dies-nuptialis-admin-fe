@@ -14,7 +14,8 @@ export const ROUTES = {
 } as const
 
 export const QUERY_KEYS = {
-  FAMILIES: (q?: string) => ['families', q] as const,
+  FAMILIES: (q?: string, page?: number) => ['families', q, page] as const,
+  FAMILY: (familyId: string) => ['family', familyId] as const,
   FAMILY_LETTER: (familyId: string) => ['family', familyId, 'letter'] as const,
   RSVPS: (page: number) => ['rsvps', page] as const,
   RSVP_SUMMARY: ['rsvp-summary'] as const,

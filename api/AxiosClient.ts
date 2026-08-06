@@ -1,6 +1,7 @@
 import axios from 'axios';
 import type { T_adminSignIn } from "./api/adminSignIn";
 import type { T_adminGetFamilies } from "./api/adminGetFamilies";
+import type { T_adminGetFamily } from "./api/adminGetFamily";
 import type { T_adminCreateFamily } from "./api/adminCreateFamily";
 import type { T_adminUpdateFamily } from "./api/adminUpdateFamily";
 import type { T_adminDeleteFamily } from "./api/adminDeleteFamily";
@@ -80,6 +81,10 @@ export namespace AxiosClient {
   export const adminGetFamilies: T_adminGetFamilies = async (req, base_url: string = BaseURL.instance.base_url) => {
     const final_url = __build_path(base_url, '/admin/families', {});
     return (await axios['get'](final_url, { headers: req.headers as any, params: req.query as any, })).data as any;
+  }
+  export const adminGetFamily: T_adminGetFamily = async (req, base_url: string = BaseURL.instance.base_url) => {
+    const final_url = __build_path(base_url, '/admin/families/:family_id', req.path);
+    return (await axios['get'](final_url, { headers: req.headers as any, })).data as any;
   }
   export const adminCreateFamily: T_adminCreateFamily = async (req, base_url: string = BaseURL.instance.base_url) => {
     const final_url = __build_path(base_url, '/admin/families', {});

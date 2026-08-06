@@ -10,8 +10,11 @@ import { ROUTES } from '~/constants'
 import { Modal } from '~/components/ui/Modal'
 import { ConfirmDialog } from '~/components/ui/ConfirmDialog'
 import { EmptyState } from '~/components/ui/EmptyState'
+import { Pagination } from '~/components/ui/Pagination'
 import { InviteActionButtons } from '~/components/InviteActionButtons'
 import type { AdminFamilyItem } from '@api/schema/AdminFamilyItem'
+
+const LIMIT = 50
 
 export default function FamiliesPage() {
   const toast = useToast()
@@ -19,9 +22,11 @@ export default function FamiliesPage() {
   const showFilter = searchParams.get('show')
   const [search, setSearch] = useState('')
   const debouncedSearch = useDebounce(search)
+  const [page, setPage] = useState(0)
   const { data, isLoading, error } = useFamilies(
     debouncedSearch || undefined,
-    showFilter === 'vegetarian' ? 500 : 50,
+    showFilter === 'vegetarian' ? 0 : page,
+    showFilter === 'vegetarian' ? 500 : LIMIT,
   )
 
   const vegetarianGuests = useMemo(() => {
@@ -131,7 +136,10 @@ export default function FamiliesPage() {
           type="search"
           placeholder="Search families..."
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          onChange={(e) => {
+            setSearch(e.target.value)
+            setPage(0)
+          }}
           className="w-full max-w-sm rounded border border-stone-300 px-3 py-2 text-sm text-stone-900 placeholder:text-stone-400 focus:border-stone-500 focus:ring-1 focus:ring-stone-500 focus:outline-none"
         />
       )}
@@ -166,62 +174,66 @@ export default function FamiliesPage() {
       )}
 
       {showFilter !== 'vegetarian' && data && data.data.length > 0 && (
-        <div className="overflow-x-auto rounded-lg border border-stone-200">
-          <table className="w-full text-left text-sm">
-            <thead className="border-b border-stone-200 bg-stone-50">
-              <tr>
-                <th className="px-4 py-3 font-medium text-stone-600">Family Name</th>
-                <th className="px-4 py-3 font-medium text-stone-600">Invite Code</th>
-                <th className="px-4 py-3 font-medium text-stone-600 text-center">Pax</th>
-                <th className="px-4 py-3 font-medium text-stone-600 text-center">Guests</th>
-                <th className="px-4 py-3 font-medium text-stone-600 text-center">RSVP</th>
-                <th className="px-4 py-3 font-medium text-stone-600 text-center">Letter</th>
-                <th className="px-4 py-3 font-medium text-stone-600" />
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-stone-100">
-              {data.data.map((family) => (
-                <tr key={family.id} className="hover:bg-stone-50">
-                  <td className="px-4 py-3">
-                    <Link
-                      to={ROUTES.FAMILY_DETAIL(family.id)}
-                      className="font-medium text-stone-900 hover:underline"
-                    >
-                      {family.fam_name}
-                    </Link>
-                  </td>
-                  <td className="px-4 py-3 font-mono text-xs text-stone-500">
-                    {family.invite_code}
-                  </td>
-                  <td className="px-4 py-3 text-center text-stone-700">
-                    {family.pax_allowed}
-                  </td>
-                  <td className="px-4 py-3 text-center text-stone-700">
-                    {family.guests.length}
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <StatusBadge active={family.has_rsvp} />
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <StatusBadge active={family.has_letter} />
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center justify-end gap-1">
-                      <InviteActionButtons family={family} />
-                      <span className="mx-1 h-4 w-px bg-stone-200" />
-                      <button
-                        onClick={() => setDeleteTarget(family)}
-                        className="rounded px-2 py-1 text-xs text-red-600 hover:bg-red-50"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </td>
+        <>
+          <div className="overflow-x-auto rounded-lg border border-stone-200">
+            <table className="w-full text-left text-sm">
+              <thead className="border-b border-stone-200 bg-stone-50">
+                <tr>
+                  <th className="px-4 py-3 font-medium text-stone-600">Family Name</th>
+                  <th className="px-4 py-3 font-medium text-stone-600">Invite Code</th>
+                  <th className="px-4 py-3 font-medium text-stone-600 text-center">Pax</th>
+                  <th className="px-4 py-3 font-medium text-stone-600 text-center">Guests</th>
+                  <th className="px-4 py-3 font-medium text-stone-600 text-center">RSVP</th>
+                  <th className="px-4 py-3 font-medium text-stone-600 text-center">Letter</th>
+                  <th className="px-4 py-3 font-medium text-stone-600" />
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-stone-100">
+                {data.data.map((family) => (
+                  <tr key={family.id} className="hover:bg-stone-50">
+                    <td className="px-4 py-3">
+                      <Link
+                        to={ROUTES.FAMILY_DETAIL(family.id)}
+                        className="font-medium text-stone-900 hover:underline"
+                      >
+                        {family.fam_name}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-3 font-mono text-xs text-stone-500">
+                      {family.invite_code}
+                    </td>
+                    <td className="px-4 py-3 text-center text-stone-700">
+                      {family.pax_allowed}
+                    </td>
+                    <td className="px-4 py-3 text-center text-stone-700">
+                      {family.guests.length}
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <StatusBadge active={family.has_rsvp} />
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <StatusBadge active={family.has_letter} />
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex items-center justify-end gap-1">
+                        <InviteActionButtons family={family} />
+                        <span className="mx-1 h-4 w-px bg-stone-200" />
+                        <button
+                          onClick={() => setDeleteTarget(family)}
+                          className="rounded px-2 py-1 text-xs text-red-600 hover:bg-red-50"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <Pagination page={page} total={data.total} limit={LIMIT} onPageChange={setPage} />
+        </>
       )}
 
       <CreateFamilyModal

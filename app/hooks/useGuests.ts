@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { AxiosClient } from '@api/AxiosClient'
 import type { GuestItem } from '@api/schema/GuestItem'
 import type { DeletedResponse } from '@api/schema/DeletedResponse'
+import { QUERY_KEYS } from '~/constants'
 import { AUTH_HEADER } from '~/lib/authHeader'
 
 export function useAddGuest() {
@@ -14,8 +15,9 @@ export function useAddGuest() {
         path: { family_id: familyId },
         body: { name },
       }),
-    onSuccess: () => {
+    onSuccess: (_data, { familyId }) => {
       queryClient.invalidateQueries({ queryKey: ['families'] })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FAMILY(familyId) })
     },
   })
 }
@@ -32,6 +34,7 @@ export function useUpdateGuest() {
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['families'] })
+      queryClient.invalidateQueries({ queryKey: ['family'] })
     },
   })
 }
@@ -47,6 +50,7 @@ export function useDeleteGuest() {
       }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['families'] })
+      queryClient.invalidateQueries({ queryKey: ['family'] })
     },
   })
 }

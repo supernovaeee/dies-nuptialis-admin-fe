@@ -1,7 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { useParams, Link, useNavigate } from 'react-router'
-import { useQueryClient } from '@tanstack/react-query'
-import { useFamilies } from '~/hooks/useFamilies'
+import { useFamily } from '~/hooks/useFamily'
 import { useUpdateFamily } from '~/hooks/useUpdateFamily'
 import { useDeleteFamily } from '~/hooks/useDeleteFamily'
 import { useAddGuest, useUpdateGuest, useDeleteGuest } from '~/hooks/useGuests'
@@ -22,8 +21,7 @@ export default function FamilyDetailPage() {
   const navigate = useNavigate()
   const toast = useToast()
 
-  const { data, isLoading, error } = useFamilies()
-  const family = data?.data.find((f) => String(f.id) === familyId)
+  const { data: family, isLoading, error } = useFamily(familyId)
 
   const deleteFamily = useDeleteFamily()
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)

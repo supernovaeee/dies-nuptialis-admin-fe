@@ -2,6 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { AxiosClient } from '@api/AxiosClient'
 import type { T_adminUpdateFamily_body } from '@api/api/adminUpdateFamily'
 import type { AdminFamilyItem } from '@api/schema/AdminFamilyItem'
+import { QUERY_KEYS } from '~/constants'
 import { AUTH_HEADER } from '~/lib/authHeader'
 
 interface UpdateFamilyVars {
@@ -19,8 +20,9 @@ export function useUpdateFamily() {
         path: { family_id: familyId },
         body,
       }),
-    onSuccess: () => {
+    onSuccess: (_data, { familyId }) => {
       queryClient.invalidateQueries({ queryKey: ['families'] })
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.FAMILY(familyId) })
     },
   })
 }
