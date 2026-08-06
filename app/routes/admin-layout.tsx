@@ -6,6 +6,7 @@ const NAV_ITEMS = [
   { to: ROUTES.DASHBOARD, label: 'Dashboard', end: true },
   { to: ROUTES.FAMILIES, label: 'Families' },
   { to: ROUTES.RSVPS, label: 'RSVPs' },
+  { to: ROUTES.RSVP_MANAGERS, label: 'RSVP Managers' },
   { to: ROUTES.WISHES, label: 'Wishes' },
   { to: ROUTES.CAROUSEL, label: 'Carousel' },
   { to: ROUTES.FAQ, label: 'FAQ' },

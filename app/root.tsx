@@ -10,6 +10,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import type { Route } from "./+types/root";
 import { AuthProvider } from "~/context/AuthContext";
+import { ManagerAuthProvider } from "~/context/ManagerAuthContext";
 import { ToastProvider } from "~/context/ToastContext";
 import "./app.css";
 
@@ -54,9 +55,11 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <ToastProvider>
-          <Outlet />
-        </ToastProvider>
+        <ManagerAuthProvider>
+          <ToastProvider>
+            <Outlet />
+          </ToastProvider>
+        </ManagerAuthProvider>
       </AuthProvider>
     </QueryClientProvider>
   );

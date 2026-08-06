@@ -5,6 +5,11 @@ import type { T_adminGetFamily } from "./api/adminGetFamily";
 import type { T_adminCreateFamily } from "./api/adminCreateFamily";
 import type { T_adminUpdateFamily } from "./api/adminUpdateFamily";
 import type { T_adminDeleteFamily } from "./api/adminDeleteFamily";
+import type { T_adminGetRsvpManagers } from "./api/adminGetRsvpManagers";
+import type { T_adminGetRsvpManager } from "./api/adminGetRsvpManager";
+import type { T_adminCreateRsvpManager } from "./api/adminCreateRsvpManager";
+import type { T_adminUpdateRsvpManager } from "./api/adminUpdateRsvpManager";
+import type { T_adminDeleteRsvpManager } from "./api/adminDeleteRsvpManager";
 import type { T_adminAddGuest } from "./api/adminAddGuest";
 import type { T_adminUpdateGuest } from "./api/adminUpdateGuest";
 import type { T_adminDeleteGuest } from "./api/adminDeleteGuest";
@@ -28,6 +33,8 @@ import type { T_adminUpdateFaq } from "./api/adminUpdateFaq";
 import type { T_adminDeleteFaq } from "./api/adminDeleteFaq";
 import type { T_adminUploadImage } from "./api/adminUploadImage";
 import type { T_authGuestFamily } from "./api/authGuestFamily";
+import type { T_authRsvpManager } from "./api/authRsvpManager";
+import type { T_managerGetFamilies } from "./api/managerGetFamilies";
 import type { T_submitRsvp } from "./api/submitRsvp";
 import type { T_getRsvp } from "./api/getRsvp";
 import type { T_submitWish } from "./api/submitWish";
@@ -96,6 +103,26 @@ export namespace AxiosClient {
   }
   export const adminDeleteFamily: T_adminDeleteFamily = async (req, base_url: string = BaseURL.instance.base_url) => {
     const final_url = __build_path(base_url, '/admin/families/:family_id', req.path);
+    return (await axios['delete'](final_url, { headers: req.headers as any, })).data as any;
+  }
+  export const adminGetRsvpManagers: T_adminGetRsvpManagers = async (req, base_url: string = BaseURL.instance.base_url) => {
+    const final_url = __build_path(base_url, '/admin/rsvp-managers', {});
+    return (await axios['get'](final_url, { headers: req.headers as any, params: req.query as any, })).data as any;
+  }
+  export const adminGetRsvpManager: T_adminGetRsvpManager = async (req, base_url: string = BaseURL.instance.base_url) => {
+    const final_url = __build_path(base_url, '/admin/rsvp-managers/:manager_id', req.path);
+    return (await axios['get'](final_url, { headers: req.headers as any, })).data as any;
+  }
+  export const adminCreateRsvpManager: T_adminCreateRsvpManager = async (req, base_url: string = BaseURL.instance.base_url) => {
+    const final_url = __build_path(base_url, '/admin/rsvp-managers', {});
+    return (await axios['post'](final_url, req.body, { headers: req.headers as any, })).data as any;
+  }
+  export const adminUpdateRsvpManager: T_adminUpdateRsvpManager = async (req, base_url: string = BaseURL.instance.base_url) => {
+    const final_url = __build_path(base_url, '/admin/rsvp-managers/:manager_id', req.path);
+    return (await axios['patch'](final_url, req.body, { headers: req.headers as any, })).data as any;
+  }
+  export const adminDeleteRsvpManager: T_adminDeleteRsvpManager = async (req, base_url: string = BaseURL.instance.base_url) => {
+    const final_url = __build_path(base_url, '/admin/rsvp-managers/:manager_id', req.path);
     return (await axios['delete'](final_url, { headers: req.headers as any, })).data as any;
   }
   export const adminAddGuest: T_adminAddGuest = async (req, base_url: string = BaseURL.instance.base_url) => {
@@ -189,6 +216,14 @@ export namespace AxiosClient {
   export const authGuestFamily: T_authGuestFamily = async (req, base_url: string = BaseURL.instance.base_url) => {
     const final_url = __build_path(base_url, '/auth/guest', {});
     return (await axios['post'](final_url, req.body, { })).data as any;
+  }
+  export const authRsvpManager: T_authRsvpManager = async (req, base_url: string = BaseURL.instance.base_url) => {
+    const final_url = __build_path(base_url, '/auth/manager', {});
+    return (await axios['post'](final_url, req.body, { })).data as any;
+  }
+  export const managerGetFamilies: T_managerGetFamilies = async (req, base_url: string = BaseURL.instance.base_url) => {
+    const final_url = __build_path(base_url, '/manager/families', {});
+    return (await axios['get'](final_url, { headers: req.headers as any, })).data as any;
   }
   export const submitRsvp: T_submitRsvp = async (req, base_url: string = BaseURL.instance.base_url) => {
     const final_url = __build_path(base_url, '/rsvp', {});

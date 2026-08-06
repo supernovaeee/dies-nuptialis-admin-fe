@@ -11,6 +11,7 @@ export interface T_adminUpdateFamily_body {
   fam_name?: string
   pax_allowed?: number
   after_party_allowed?: boolean
+  rsvp_manager_id?: number
 }
 
 

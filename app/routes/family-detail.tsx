@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router'
 import { useFamily } from '~/hooks/useFamily'
 import { useUpdateFamily } from '~/hooks/useUpdateFamily'
 import { useDeleteFamily } from '~/hooks/useDeleteFamily'
+import { useRsvpManagers } from '~/hooks/useRsvpManagers'
 import { useAddGuest, useUpdateGuest, useDeleteGuest } from '~/hooks/useGuests'
 import { useLetter, useUpsertLetter } from '~/hooks/useLetter'
 import { useToast } from '~/context/ToastContext'
@@ -85,6 +86,7 @@ export default function FamilyDetailPage() {
       </div>
 
       <FamilyInfoSection family={family} />
+      <RsvpManagerTagSection family={family} />
       <GuestSection family={family} />
       <LetterSection familyId={familyId!} />
 
@@ -208,6 +210,59 @@ function FamilyInfoSection({ family }: { family: AdminFamilyItem }) {
           </div>
         </dl>
       )}
+    </section>
+  )
+}
+
+function RsvpManagerTagSection({ family }: { family: AdminFamilyItem }) {
+  const toast = useToast()
+  const { data: managers } = useRsvpManagers(undefined, 0, 200)
+  const updateFamily = useUpdateFamily()
+
+  function handleChange(e: React.ChangeEvent<HTMLSelectElement>) {
+    const value = e.target.value
+    // The generated body type doesn't model "explicit null clears the FK"
+    // (same NAIV codegen limitation as the backend's own body type) — the
+    // API does accept and require a literal null to untag.
+    const rsvpManagerId = (value === '' ? null : Number(value)) as number | undefined
+    updateFamily.mutate(
+      {
+        familyId: String(family.id),
+        body: { rsvp_manager_id: rsvpManagerId },
+      },
+      {
+        onSuccess: () => {
+          toast.success(value === '' ? 'Family untagged' : 'Family tagged')
+        },
+        onError: (err) => {
+          toast.error(getApiErrorMessage(err, 'Failed to update RSVP manager tag'))
+        },
+      },
+    )
+  }
+
+  return (
+    <section className="rounded-lg border border-stone-200 bg-white p-5">
+      <h2 className="mb-4 text-sm font-medium text-stone-700">RSVP Manager</h2>
+      <div className="max-w-xs space-y-1.5">
+        <label htmlFor="rsvp_manager_id" className="block text-xs font-medium text-stone-600">
+          Tagged to
+        </label>
+        <select
+          id="rsvp_manager_id"
+          value={family.rsvp_manager_id ?? ''}
+          onChange={handleChange}
+          disabled={updateFamily.isPending}
+          className="w-full rounded border border-stone-300 px-3 py-1.5 text-sm text-stone-900 focus:border-stone-500 focus:ring-1 focus:ring-stone-500 focus:outline-none disabled:opacity-50"
+        >
+          <option value="">— Untagged —</option>
+          {managers?.data.map((manager) => (
+            <option key={manager.id} value={manager.id}>
+              {manager.name}
+            </option>
+          ))}
+        </select>
+      </div>
     </section>
   )
 }

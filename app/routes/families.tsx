@@ -185,6 +185,7 @@ export default function FamiliesPage() {
                   <th className="px-4 py-3 font-medium text-stone-600 text-center">Guests</th>
                   <th className="px-4 py-3 font-medium text-stone-600 text-center">RSVP</th>
                   <th className="px-4 py-3 font-medium text-stone-600 text-center">Letter</th>
+                  <th className="px-4 py-3 font-medium text-stone-600">Manager</th>
                   <th className="px-4 py-3 font-medium text-stone-600" />
                 </tr>
               </thead>
@@ -213,6 +214,9 @@ export default function FamiliesPage() {
                     </td>
                     <td className="px-4 py-3 text-center">
                       <StatusBadge active={family.has_letter} />
+                    </td>
+                    <td className="px-4 py-3 text-stone-600">
+                      {family.rsvp_manager_name ?? <span className="text-stone-300">—</span>}
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-1">

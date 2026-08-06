@@ -1,4 +1,5 @@
 export const TOKEN_KEY = 'dies_admin_token'
+export const MANAGER_TOKEN_KEY = 'dies_manager_token'
 
 export const GUEST_SITE_URL = 'https://amity.azzamarcel.com'
 
@@ -11,6 +12,9 @@ export const ROUTES = {
   WISHES: '/wishes',
   CAROUSEL: '/carousel',
   FAQ: '/faq',
+  RSVP_MANAGERS: '/rsvp-managers',
+  MANAGER_LOGIN: '/manager/login',
+  MANAGER_DASHBOARD: '/manager',
 } as const
 
 export const QUERY_KEYS = {
@@ -22,4 +26,6 @@ export const QUERY_KEYS = {
   WISHES: (page: number, status?: string) => ['wishes', page, status] as const,
   CAROUSEL_CARDS: ['carousel-cards'] as const,
   FAQS: ['faqs'] as const,
+  RSVP_MANAGERS: (q?: string, page?: number) => ['rsvp-managers', q, page] as const,
+  MANAGER_FAMILIES: ['manager-families'] as const,
 } as const
