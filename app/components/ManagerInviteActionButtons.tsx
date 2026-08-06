@@ -9,7 +9,7 @@ export function ManagerInviteActionButtons({ manager, className = '' }: ManagerI
   const { copyLink, copyMessage } = useCopyManagerInvite()
 
   return (
-    <div className={`flex items-center gap-1 ${className}`}>
+    <div className={`flex flex-wrap items-center gap-1 ${className}`}>
       <button
         onClick={() => copyLink(manager)}
         className="flex items-center gap-1 rounded px-2 py-1 text-xs text-stone-600 hover:bg-stone-100"

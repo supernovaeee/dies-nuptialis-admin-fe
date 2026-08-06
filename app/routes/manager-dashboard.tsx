@@ -36,32 +36,50 @@ export default function ManagerDashboardPage() {
       )}
 
       {data && data.data.length > 0 && (
-        <div className="overflow-x-auto rounded-lg border border-stone-200 bg-white">
-          <table className="w-full text-left text-sm">
-            <thead className="border-b border-stone-200 bg-stone-50">
-              <tr>
-                <th className="px-4 py-3 font-medium text-stone-600">Family</th>
-                <th className="px-4 py-3 font-medium text-stone-600">RSVP</th>
-                <th className="px-4 py-3 font-medium text-stone-600" />
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-stone-100">
-              {data.data.map((family) => (
-                <tr key={family.id} className="hover:bg-stone-50">
-                  <td className="px-4 py-3 font-medium text-stone-900">{family.fam_name}</td>
-                  <td className="px-4 py-3">
-                    <RsvpBadge status={family.rsvp_status} />
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex justify-end">
-                      <InviteActionButtons family={family} />
-                    </div>
-                  </td>
+        <>
+          {/* Mobile: card list */}
+          <div className="space-y-3 sm:hidden">
+            {data.data.map((family) => (
+              <div key={family.id} className="rounded-lg border border-stone-200 bg-white p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="font-medium text-stone-900">{family.fam_name}</p>
+                  <RsvpBadge status={family.rsvp_status} />
+                </div>
+                <div className="mt-3 flex flex-wrap items-center gap-1 border-t border-stone-100 pt-3">
+                  <InviteActionButtons family={family} />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop: table */}
+          <div className="hidden overflow-x-auto rounded-lg border border-stone-200 bg-white sm:block">
+            <table className="w-full text-left text-sm">
+              <thead className="border-b border-stone-200 bg-stone-50">
+                <tr>
+                  <th className="px-4 py-3 font-medium text-stone-600">Family</th>
+                  <th className="px-4 py-3 font-medium text-stone-600">RSVP</th>
+                  <th className="px-4 py-3 font-medium text-stone-600" />
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-stone-100">
+                {data.data.map((family) => (
+                  <tr key={family.id} className="hover:bg-stone-50">
+                    <td className="px-4 py-3 font-medium text-stone-900">{family.fam_name}</td>
+                    <td className="px-4 py-3">
+                      <RsvpBadge status={family.rsvp_status} />
+                    </td>
+                    <td className="px-4 py-3">
+                      <div className="flex justify-end">
+                        <InviteActionButtons family={family} />
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
     </div>
   )

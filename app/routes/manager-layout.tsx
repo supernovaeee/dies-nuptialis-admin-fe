@@ -12,7 +12,7 @@ export default function ManagerLayout() {
   return (
     <div className="min-h-screen bg-stone-50">
       <Header />
-      <main className="mx-auto max-w-3xl p-6 lg:p-8">
+      <main className="mx-auto max-w-3xl p-4 sm:p-6 lg:p-8">
         <Outlet />
       </main>
     </div>

@@ -9,7 +9,7 @@ export function InviteActionButtons({ family, className = '' }: InviteActionButt
   const { copyLink, copyMessage } = useCopyInvite()
 
   return (
-    <div className={`flex items-center gap-1 ${className}`}>
+    <div className={`flex flex-wrap items-center gap-1 ${className}`}>
       <button
         onClick={() => copyLink(family)}
         className="flex items-center gap-1 rounded px-2 py-1 text-xs text-stone-600 hover:bg-stone-100"

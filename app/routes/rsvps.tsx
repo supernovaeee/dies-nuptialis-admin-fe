@@ -200,7 +200,46 @@ export default function RsvpsPage() {
 
       {filteredData && filteredData.data.length > 0 && (
         <>
-          <div className="overflow-x-auto rounded-lg border border-stone-200">
+          {/* Mobile/tablet: card list */}
+          <div className="space-y-3 md:hidden">
+            {filteredData.data.map((rsvp) => (
+              <div key={rsvp.id} className="rounded-lg border border-stone-200 bg-white p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <Link
+                    to={ROUTES.FAMILY_DETAIL(rsvp.family_id)}
+                    className="font-medium text-stone-900 hover:underline"
+                  >
+                    {rsvp.fam_name}
+                  </Link>
+                  <RsvpBadge status={rsvp.attending_main_status} />
+                </div>
+                {rsvp.special_notes && (
+                  <p className="mt-2 text-sm text-stone-600">{rsvp.special_notes}</p>
+                )}
+                {rsvp.email && <p className="mt-1 text-sm text-stone-600">{rsvp.email}</p>}
+                <p className="mt-2 text-xs text-stone-400">
+                  {new Date(rsvp.submitted_at).toLocaleDateString()}
+                </p>
+                <div className="mt-3 flex justify-end gap-1 border-t border-stone-100 pt-3">
+                  <button
+                    onClick={() => openEdit(rsvp)}
+                    className="rounded px-2 py-1 text-xs text-stone-600 hover:bg-stone-100"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => setDeleteTarget(rsvp)}
+                    className="rounded px-2 py-1 text-xs text-red-600 hover:bg-red-50"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop: table */}
+          <div className="hidden overflow-x-auto rounded-lg border border-stone-200 md:block">
             <table className="w-full text-left text-sm">
               <thead className="border-b border-stone-200 bg-stone-50">
                 <tr>

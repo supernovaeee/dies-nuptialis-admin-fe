@@ -99,7 +99,38 @@ export default function RsvpManagersPage() {
 
       {data && data.data.length > 0 && (
         <>
-          <div className="overflow-x-auto rounded-lg border border-stone-200">
+          {/* Mobile/tablet: card list */}
+          <div className="space-y-3 md:hidden">
+            {data.data.map((manager) => (
+              <div key={manager.id} className="rounded-lg border border-stone-200 bg-white p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <p className="font-medium text-stone-900">{manager.name}</p>
+                  <span className="shrink-0 text-xs text-stone-500">
+                    {manager.family_count} {manager.family_count === 1 ? 'family' : 'families'}
+                  </span>
+                </div>
+                <p className="mt-0.5 font-mono text-xs text-stone-500">{manager.passcode}</p>
+                <div className="mt-3 flex flex-wrap items-center gap-1 border-t border-stone-100 pt-3">
+                  <ManagerInviteActionButtons manager={manager} />
+                  <button
+                    onClick={() => setEditTarget(manager)}
+                    className="rounded px-2 py-1 text-xs text-stone-600 hover:bg-stone-100"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => setDeleteTarget(manager)}
+                    className="rounded px-2 py-1 text-xs text-red-600 hover:bg-red-50"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop: table */}
+          <div className="hidden overflow-x-auto rounded-lg border border-stone-200 md:block">
             <table className="w-full text-left text-sm">
               <thead className="border-b border-stone-200 bg-stone-50">
                 <tr>

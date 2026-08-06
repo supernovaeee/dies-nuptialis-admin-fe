@@ -175,7 +175,64 @@ export default function FamiliesPage() {
 
       {showFilter !== 'vegetarian' && data && data.data.length > 0 && (
         <>
-          <div className="overflow-x-auto rounded-lg border border-stone-200">
+          {/* Mobile/tablet: card list */}
+          <div className="space-y-3 lg:hidden">
+            {data.data.map((family) => (
+              <div key={family.id} className="rounded-lg border border-stone-200 bg-white p-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <Link
+                      to={ROUTES.FAMILY_DETAIL(family.id)}
+                      className="font-medium text-stone-900 hover:underline"
+                    >
+                      {family.fam_name}
+                    </Link>
+                    <p className="mt-0.5 font-mono text-xs text-stone-500">{family.invite_code}</p>
+                  </div>
+                  <button
+                    onClick={() => setDeleteTarget(family)}
+                    className="shrink-0 rounded px-2 py-1 text-xs text-red-600 hover:bg-red-50"
+                  >
+                    Delete
+                  </button>
+                </div>
+
+                <dl className="mt-3 grid grid-cols-2 gap-y-2 text-xs sm:grid-cols-4">
+                  <div>
+                    <dt className="text-stone-500">Pax</dt>
+                    <dd className="mt-0.5 text-stone-700">{family.pax_allowed}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-stone-500">Guests</dt>
+                    <dd className="mt-0.5 text-stone-700">{family.guests.length}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-stone-500">RSVP</dt>
+                    <dd className="mt-0.5">
+                      <StatusBadge active={family.has_rsvp} />
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-stone-500">Letter</dt>
+                    <dd className="mt-0.5">
+                      <StatusBadge active={family.has_letter} />
+                    </dd>
+                  </div>
+                </dl>
+
+                <p className="mt-2 text-xs text-stone-500">
+                  Manager: {family.rsvp_manager_name ?? <span className="text-stone-300">—</span>}
+                </p>
+
+                <div className="mt-3 flex flex-wrap items-center gap-1 border-t border-stone-100 pt-3">
+                  <InviteActionButtons family={family} />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop: table */}
+          <div className="hidden overflow-x-auto rounded-lg border border-stone-200 lg:block">
             <table className="w-full text-left text-sm">
               <thead className="border-b border-stone-200 bg-stone-50">
                 <tr>
