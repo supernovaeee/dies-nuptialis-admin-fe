@@ -9,8 +9,7 @@ export function buildInviteLink(family: Pick<InviteFamily, 'invite_code'>): stri
   return `${GUEST_SITE_URL}/${family.invite_code}`
 }
 
-export function buildInviteMessage(family: InviteFamily): string {
-  const link = buildInviteLink(family)
+function defaultInviteMessage(family: InviteFamily, link: string): string {
   return `Dear ${family.fam_name},
 
 It is with great joy and honor that we invite you to our wedding.
@@ -33,4 +32,15 @@ We hope to see you at the pews!
 
 With love,
 Azza & Marcel`
+}
+
+// When an RSVP manager has configured their own template (see
+// manager-dashboard.tsx), it takes over the "Copy Message" button for the
+// families tagged to them. {{name}} and {{link}} are substituted per family.
+export function buildInviteMessage(family: InviteFamily, template?: string): string {
+  const link = buildInviteLink(family)
+  if (template?.trim()) {
+    return template.replaceAll('{{name}}', family.fam_name).replaceAll('{{link}}', link)
+  }
+  return defaultInviteMessage(family, link)
 }

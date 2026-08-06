@@ -2,11 +2,13 @@ import { useCopyInvite } from '~/hooks/useCopyInvite'
 
 interface InviteActionButtonsProps {
   family: { fam_name: string; invite_code: string }
+  /** RSVP manager's own message template, if any — see manager-dashboard.tsx */
+  template?: string
   className?: string
 }
 
-export function InviteActionButtons({ family, className = '' }: InviteActionButtonsProps) {
-  const { copyLink, copyMessage } = useCopyInvite()
+export function InviteActionButtons({ family, template, className = '' }: InviteActionButtonsProps) {
+  const { copyLink, copyMessage } = useCopyInvite(template)
 
   return (
     <div className={`flex flex-wrap items-center gap-1 ${className}`}>

@@ -6,7 +6,7 @@ interface InviteFamily {
   invite_code: string
 }
 
-export function useCopyInvite() {
+export function useCopyInvite(template?: string) {
   const toast = useToast()
 
   async function copyLink(family: Pick<InviteFamily, 'invite_code'>) {
@@ -20,7 +20,7 @@ export function useCopyInvite() {
 
   async function copyMessage(family: InviteFamily) {
     try {
-      await navigator.clipboard.writeText(buildInviteMessage(family))
+      await navigator.clipboard.writeText(buildInviteMessage(family, template))
       toast.success('Invite message copied to clipboard')
     } catch {
       toast.error('Failed to copy message')

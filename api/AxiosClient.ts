@@ -35,6 +35,7 @@ import type { T_adminUploadImage } from "./api/adminUploadImage";
 import type { T_authGuestFamily } from "./api/authGuestFamily";
 import type { T_authRsvpManager } from "./api/authRsvpManager";
 import type { T_managerGetFamilies } from "./api/managerGetFamilies";
+import type { T_managerUpdateMessage } from "./api/managerUpdateMessage";
 import type { T_submitRsvp } from "./api/submitRsvp";
 import type { T_getRsvp } from "./api/getRsvp";
 import type { T_submitWish } from "./api/submitWish";
@@ -224,6 +225,10 @@ export namespace AxiosClient {
   export const managerGetFamilies: T_managerGetFamilies = async (req, base_url: string = BaseURL.instance.base_url) => {
     const final_url = __build_path(base_url, '/manager/families', {});
     return (await axios['get'](final_url, { headers: req.headers as any, })).data as any;
+  }
+  export const managerUpdateMessage: T_managerUpdateMessage = async (req, base_url: string = BaseURL.instance.base_url) => {
+    const final_url = __build_path(base_url, '/manager/message', {});
+    return (await axios['patch'](final_url, req.body, { headers: req.headers as any, })).data as any;
   }
   export const submitRsvp: T_submitRsvp = async (req, base_url: string = BaseURL.instance.base_url) => {
     const final_url = __build_path(base_url, '/rsvp', {});

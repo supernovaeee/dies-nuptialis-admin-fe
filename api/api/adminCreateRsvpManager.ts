@@ -6,7 +6,6 @@ export interface T_adminCreateRsvpManager_headers {
 }
 export interface T_adminCreateRsvpManager_body {
   name: string
-  message?: string
 }
 
 

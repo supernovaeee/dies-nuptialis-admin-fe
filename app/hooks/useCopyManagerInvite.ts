@@ -4,7 +4,6 @@ import { buildManagerLink, buildManagerMessage } from '~/lib/managerInvite'
 interface InviteManager {
   name: string
   passcode: string
-  message?: string
 }
 
 export function useCopyManagerInvite() {
