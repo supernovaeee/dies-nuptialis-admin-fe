@@ -8,6 +8,11 @@ export interface T_adminGetFamilies_query {
   limit?: number
   offset?: number
   q?: string
+  rsvp_manager_id?: number
+  rsvp_status?: string
+  has_letter?: boolean
+  guests_min?: number
+  guests_max?: number
 }
 
 

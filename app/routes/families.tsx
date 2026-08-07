@@ -4,6 +4,7 @@ import { useFamilies } from '~/hooks/useFamilies'
 import { useCreateFamily } from '~/hooks/useCreateFamily'
 import { useDeleteFamily } from '~/hooks/useDeleteFamily'
 import { useDebounce } from '~/hooks/useDebounce'
+import { useRsvpManagers } from '~/hooks/useRsvpManagers'
 import { useToast } from '~/context/ToastContext'
 import { getApiErrorMessage } from '~/lib/apiError'
 import { ROUTES } from '~/constants'
@@ -12,9 +13,14 @@ import { ConfirmDialog } from '~/components/ui/ConfirmDialog'
 import { EmptyState } from '~/components/ui/EmptyState'
 import { Pagination } from '~/components/ui/Pagination'
 import { InviteActionButtons } from '~/components/InviteActionButtons'
+import { RsvpBadge } from '~/components/RsvpBadge'
+import { RSVPStatus } from '@api/model/enum/RSVPStatus'
 import type { AdminFamilyItem } from '@api/schema/AdminFamilyItem'
 
 const LIMIT = 50
+const UNASSIGNED_MANAGER = 'unassigned'
+const FILTER_CONTROL_CLASS =
+  'rounded border border-stone-300 px-2.5 py-1.5 text-sm text-stone-900 focus:border-stone-500 focus:ring-1 focus:ring-stone-500 focus:outline-none'
 
 export default function FamiliesPage() {
   const toast = useToast()
@@ -23,8 +29,45 @@ export default function FamiliesPage() {
   const [search, setSearch] = useState('')
   const debouncedSearch = useDebounce(search)
   const [page, setPage] = useState(0)
+
+  const managerFilter = searchParams.get('manager') ?? ''
+  const statusFilter = searchParams.get('status') ?? ''
+  const letterFilter = searchParams.get('letter') ?? ''
+  const guestsMinFilter = searchParams.get('guests_min') ?? ''
+  const guestsMaxFilter = searchParams.get('guests_max') ?? ''
+  const hasActiveFilters = !!(managerFilter || statusFilter || letterFilter || guestsMinFilter || guestsMaxFilter)
+
+  function setFilter(key: string, value: string) {
+    const next = new URLSearchParams(searchParams)
+    if (value) next.set(key, value)
+    else next.delete(key)
+    setSearchParams(next)
+    setPage(0)
+  }
+
+  function clearAllFilters() {
+    const next = new URLSearchParams(searchParams)
+    for (const key of ['manager', 'status', 'letter', 'guests_min', 'guests_max']) next.delete(key)
+    setSearchParams(next)
+    setPage(0)
+  }
+
+  const { data: managersData } = useRsvpManagers(undefined, 0, 200)
+
   const { data, isLoading, error } = useFamilies(
-    debouncedSearch || undefined,
+    {
+      q: debouncedSearch || undefined,
+      rsvpManagerId:
+        managerFilter && managerFilter !== UNASSIGNED_MANAGER
+          ? Number(managerFilter)
+          : managerFilter === UNASSIGNED_MANAGER
+            ? 0
+            : undefined,
+      rsvpStatus: statusFilter || undefined,
+      hasLetter: letterFilter ? letterFilter === 'true' : undefined,
+      guestsMin: guestsMinFilter !== '' ? Number(guestsMinFilter) : undefined,
+      guestsMax: guestsMaxFilter !== '' ? Number(guestsMaxFilter) : undefined,
+    },
     showFilter === 'vegetarian' ? 0 : page,
     showFilter === 'vegetarian' ? 500 : LIMIT,
   )
@@ -132,16 +175,109 @@ export default function FamiliesPage() {
       )}
 
       {showFilter !== 'vegetarian' && (
-        <input
-          type="search"
-          placeholder="Search families..."
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value)
-            setPage(0)
-          }}
-          className="w-full max-w-sm rounded border border-stone-300 px-3 py-2 text-sm text-stone-900 placeholder:text-stone-400 focus:border-stone-500 focus:ring-1 focus:ring-stone-500 focus:outline-none"
-        />
+        <div className="space-y-3">
+          <input
+            type="search"
+            placeholder="Search families..."
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value)
+              setPage(0)
+            }}
+            className="w-full max-w-sm rounded border border-stone-300 px-3 py-2 text-sm text-stone-900 placeholder:text-stone-400 focus:border-stone-500 focus:ring-1 focus:ring-stone-500 focus:outline-none"
+          />
+
+          <div className="flex flex-wrap items-end gap-3 rounded-lg border border-stone-200 bg-stone-50/60 p-3">
+            <div className="space-y-1">
+              <label htmlFor="filter-manager" className="block text-xs font-medium text-stone-500">
+                RSVP Manager
+              </label>
+              <select
+                id="filter-manager"
+                value={managerFilter}
+                onChange={(e) => setFilter('manager', e.target.value)}
+                className={FILTER_CONTROL_CLASS}
+              >
+                <option value="">All managers</option>
+                <option value={UNASSIGNED_MANAGER}>Unassigned</option>
+                {managersData?.data.map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {m.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="space-y-1">
+              <label htmlFor="filter-status" className="block text-xs font-medium text-stone-500">
+                RSVP Status
+              </label>
+              <select
+                id="filter-status"
+                value={statusFilter}
+                onChange={(e) => setFilter('status', e.target.value)}
+                className={FILTER_CONTROL_CLASS}
+              >
+                <option value="">All statuses</option>
+                {Object.values(RSVPStatus).map((status) => (
+                  <option key={status} value={status}>
+                    {status}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="space-y-1">
+              <label htmlFor="filter-letter" className="block text-xs font-medium text-stone-500">
+                Letter
+              </label>
+              <select
+                id="filter-letter"
+                value={letterFilter}
+                onChange={(e) => setFilter('letter', e.target.value)}
+                className={FILTER_CONTROL_CLASS}
+              >
+                <option value="">Any</option>
+                <option value="true">Has letter</option>
+                <option value="false">No letter</option>
+              </select>
+            </div>
+
+            <div className="space-y-1">
+              <span className="block text-xs font-medium text-stone-500">Guests</span>
+              <div className="flex items-center gap-1.5">
+                <input
+                  type="number"
+                  min={0}
+                  inputMode="numeric"
+                  placeholder="Min"
+                  value={guestsMinFilter}
+                  onChange={(e) => setFilter('guests_min', e.target.value)}
+                  className={`${FILTER_CONTROL_CLASS} w-20`}
+                />
+                <span className="text-stone-400">–</span>
+                <input
+                  type="number"
+                  min={0}
+                  inputMode="numeric"
+                  placeholder="Max"
+                  value={guestsMaxFilter}
+                  onChange={(e) => setFilter('guests_max', e.target.value)}
+                  className={`${FILTER_CONTROL_CLASS} w-20`}
+                />
+              </div>
+            </div>
+
+            {hasActiveFilters && (
+              <button
+                onClick={clearAllFilters}
+                className="rounded px-2 py-1.5 text-xs font-medium text-stone-500 hover:bg-stone-100 hover:text-stone-700"
+              >
+                Clear filters
+              </button>
+            )}
+          </div>
+        </div>
       )}
 
       {showFilter !== 'vegetarian' && error && (
@@ -158,7 +294,24 @@ export default function FamiliesPage() {
         </div>
       )}
 
-      {showFilter !== 'vegetarian' && data && data.data.length === 0 && (
+      {showFilter !== 'vegetarian' && data && data.data.length === 0 && (hasActiveFilters || debouncedSearch) && (
+        <EmptyState
+          title="No matching families"
+          description="Try adjusting or clearing the search and filters."
+          action={
+            hasActiveFilters ? (
+              <button
+                onClick={clearAllFilters}
+                className="rounded border border-stone-300 px-3 py-1.5 text-sm text-stone-700 hover:bg-stone-50"
+              >
+                Clear filters
+              </button>
+            ) : undefined
+          }
+        />
+      )}
+
+      {showFilter !== 'vegetarian' && data && data.data.length === 0 && !hasActiveFilters && !debouncedSearch && (
         <EmptyState
           title="No families yet"
           description="Add a family to get started."
@@ -209,7 +362,7 @@ export default function FamiliesPage() {
                   <div>
                     <dt className="text-stone-500">RSVP</dt>
                     <dd className="mt-0.5">
-                      <StatusBadge active={family.has_rsvp} />
+                      <RsvpBadge status={family.rsvp_status} />
                     </dd>
                   </div>
                   <div>
@@ -267,7 +420,7 @@ export default function FamiliesPage() {
                       {family.guests.length}
                     </td>
                     <td className="px-4 py-3 text-center">
-                      <StatusBadge active={family.has_rsvp} />
+                      <RsvpBadge status={family.rsvp_status} />
                     </td>
                     <td className="px-4 py-3 text-center">
                       <StatusBadge active={family.has_letter} />

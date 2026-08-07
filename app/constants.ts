@@ -18,7 +18,15 @@ export const ROUTES = {
 } as const
 
 export const QUERY_KEYS = {
-  FAMILIES: (q?: string, page?: number) => ['families', q, page] as const,
+  FAMILIES: (
+    q?: string,
+    page?: number,
+    rsvpManagerId?: number,
+    rsvpStatus?: string,
+    hasLetter?: boolean,
+    guestsMin?: number,
+    guestsMax?: number,
+  ) => ['families', q, page, rsvpManagerId, rsvpStatus, hasLetter, guestsMin, guestsMax] as const,
   FAMILY: (familyId: string) => ['family', familyId] as const,
   FAMILY_LETTER: (familyId: string) => ['family', familyId, 'letter'] as const,
   RSVPS: (page: number) => ['rsvps', page] as const,
