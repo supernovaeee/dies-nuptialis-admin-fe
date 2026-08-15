@@ -58,11 +58,7 @@ export default function FamiliesPage() {
     {
       q: debouncedSearch || undefined,
       rsvpManagerId:
-        managerFilter && managerFilter !== UNASSIGNED_MANAGER
-          ? Number(managerFilter)
-          : managerFilter === UNASSIGNED_MANAGER
-            ? 0
-            : undefined,
+        managerFilter && managerFilter !== UNASSIGNED_MANAGER ? Number(managerFilter) : undefined,
       rsvpStatus: statusFilter || undefined,
       hasLetter: letterFilter ? letterFilter === 'true' : undefined,
       guestsMin: guestsMinFilter !== '' ? Number(guestsMinFilter) : undefined,
@@ -71,6 +67,14 @@ export default function FamiliesPage() {
     showFilter === 'vegetarian' ? 0 : page,
     showFilter === 'vegetarian' ? 500 : LIMIT,
   )
+
+  const families = useMemo(() => {
+    if (!data) return []
+    // The API has no server-side "unassigned" filter — it simply omits
+    // rsvp_manager_name for families without a manager, so detect it here.
+    if (managerFilter !== UNASSIGNED_MANAGER) return data.data
+    return data.data.filter((family) => !family.rsvp_manager_name)
+  }, [data, managerFilter])
 
   const vegetarianGuests = useMemo(() => {
     if (showFilter !== 'vegetarian' || !data) return []
@@ -294,7 +298,7 @@ export default function FamiliesPage() {
         </div>
       )}
 
-      {showFilter !== 'vegetarian' && data && data.data.length === 0 && (hasActiveFilters || debouncedSearch) && (
+      {showFilter !== 'vegetarian' && data && families.length === 0 && (hasActiveFilters || debouncedSearch) && (
         <EmptyState
           title="No matching families"
           description="Try adjusting or clearing the search and filters."
@@ -311,7 +315,7 @@ export default function FamiliesPage() {
         />
       )}
 
-      {showFilter !== 'vegetarian' && data && data.data.length === 0 && !hasActiveFilters && !debouncedSearch && (
+      {showFilter !== 'vegetarian' && data && families.length === 0 && !hasActiveFilters && !debouncedSearch && (
         <EmptyState
           title="No families yet"
           description="Add a family to get started."
@@ -326,11 +330,11 @@ export default function FamiliesPage() {
         />
       )}
 
-      {showFilter !== 'vegetarian' && data && data.data.length > 0 && (
+      {showFilter !== 'vegetarian' && data && families.length > 0 && (
         <>
           {/* Mobile/tablet: card list */}
           <div className="space-y-3 lg:hidden">
-            {data.data.map((family) => (
+            {families.map((family) => (
               <div key={family.id} className="rounded-lg border border-stone-200 bg-white p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
@@ -400,7 +404,7 @@ export default function FamiliesPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-100">
-                {data.data.map((family) => (
+                {families.map((family) => (
                   <tr key={family.id} className="hover:bg-stone-50">
                     <td className="px-4 py-3">
                       <Link
