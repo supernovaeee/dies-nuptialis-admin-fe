@@ -56,7 +56,7 @@ export default function DashboardPage() {
           subtitle={data ? `${data.pending_members} members` : undefined}
           loading={isLoading}
           color="amber"
-          to={`${ROUTES.RSVPS}?main=PENDING`}
+          to={`${ROUTES.FAMILIES}?status=PENDING`}
         />
         <SummaryCard
           label="Vegetarian"

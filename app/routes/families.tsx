@@ -66,8 +66,10 @@ export default function FamiliesPage() {
   const { data, isLoading, error } = useFamilies(
     {
       q: debouncedSearch || undefined,
+      // The backend special-cases rsvp_manager_id=0 to mean "no manager assigned"
+      // (see familyRepository.ts) — everything else is an exact FK match.
       rsvpManagerId:
-        managerFilter && managerFilter !== UNASSIGNED_MANAGER ? Number(managerFilter) : undefined,
+        managerFilter === UNASSIGNED_MANAGER ? 0 : managerFilter ? Number(managerFilter) : undefined,
       rsvpStatus: statusFilter || undefined,
       hasLetter: letterFilter ? letterFilter === 'true' : undefined,
       guestsMin: guestsMinFilter !== '' ? Number(guestsMinFilter) : undefined,
@@ -80,19 +82,15 @@ export default function FamiliesPage() {
   const families = useMemo(() => {
     if (!data) return []
     let result = data.data
-    // The API has no server-side "unassigned" filter — it simply omits
-    // rsvp_manager_name for families without a manager, so detect it here.
-    if (managerFilter === UNASSIGNED_MANAGER) {
-      result = result.filter((family) => !family.rsvp_manager_name)
-    }
-    // Same story for the attendance marker — it's admin-set client data, not a server filter.
+    // The API has no server-side filter for the attendance marker — it's
+    // admin-set client data, not something the backend can query on yet.
     if (attendanceFilter === 'unmarked') {
       result = result.filter((family) => !family.has_rsvp && !family.attending_main_status_marker)
     } else if (attendanceFilter === RSVPStatus.ATTENDING || attendanceFilter === RSVPStatus.DECLINED) {
       result = result.filter((family) => !family.has_rsvp && family.attending_main_status_marker === attendanceFilter)
     }
     return result
-  }, [data, managerFilter, attendanceFilter])
+  }, [data, attendanceFilter])
 
   const vegetarianGuests = useMemo(() => {
     if (showFilter !== 'vegetarian' || !data) return []
