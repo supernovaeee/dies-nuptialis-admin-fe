@@ -6,6 +6,7 @@ export default [
     index("routes/dashboard.tsx"),
     route("families", "routes/families.tsx"),
     route("families/:familyId", "routes/family-detail.tsx"),
+    route("guests", "routes/guests.tsx"),
     route("rsvps", "routes/rsvps.tsx"),
     route("rsvp-managers", "routes/rsvp-managers.tsx"),
     route("wishes", "routes/wishes.tsx"),

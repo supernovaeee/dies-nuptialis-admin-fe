@@ -6,6 +6,7 @@ import { TOKEN_KEY, ROUTES } from '~/constants'
 const NAV_ITEMS = [
   { to: ROUTES.DASHBOARD, label: 'Dashboard', end: true },
   { to: ROUTES.FAMILIES, label: 'Families' },
+  { to: ROUTES.GUESTS, label: 'Guests' },
   { to: ROUTES.RSVPS, label: 'RSVPs' },
   { to: ROUTES.RSVP_MANAGERS, label: 'RSVP Managers' },
   { to: ROUTES.WISHES, label: 'Wishes' },

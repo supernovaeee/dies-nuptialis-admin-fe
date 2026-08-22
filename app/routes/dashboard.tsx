@@ -62,7 +62,7 @@ export default function DashboardPage() {
           label="Vegetarian"
           value={data?.vegetarian_count}
           loading={isLoading}
-          to={`${ROUTES.FAMILIES}?show=vegetarian`}
+          to={`${ROUTES.GUESTS}?vegetarian=true`}
         />
       </div>
 

@@ -1,4 +1,4 @@
-import { useState, useMemo, type FormEvent } from 'react'
+import { useState, type FormEvent } from 'react'
 import { Link, useSearchParams } from 'react-router'
 import { useFamilies } from '~/hooks/useFamilies'
 import { useCreateFamily } from '~/hooks/useCreateFamily'
@@ -26,7 +26,6 @@ const FILTER_CONTROL_CLASS =
 export default function FamiliesPage() {
   const toast = useToast()
   const [searchParams, setSearchParams] = useSearchParams()
-  const showFilter = searchParams.get('show')
   const [search, setSearch] = useState('')
   const debouncedSearch = useDebounce(search)
   const [page, setPage] = useState(0)
@@ -76,20 +75,11 @@ export default function FamiliesPage() {
       guestsMin: guestsMinFilter !== '' ? Number(guestsMinFilter) : undefined,
       guestsMax: guestsMaxFilter !== '' ? Number(guestsMaxFilter) : undefined,
     },
-    showFilter === 'vegetarian' ? 0 : page,
-    showFilter === 'vegetarian' ? 500 : LIMIT,
+    page,
+    LIMIT,
   )
 
   const families = data?.data ?? []
-
-  const vegetarianGuests = useMemo(() => {
-    if (showFilter !== 'vegetarian' || !data) return []
-    return data.data.flatMap((family) =>
-      family.guests
-        .filter((g) => g.vegetarian)
-        .map((g) => ({ guestName: g.name, familyName: family.fam_name, familyId: family.id })),
-    )
-  }, [data, showFilter])
 
   const [showCreate, setShowCreate] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<AdminFamilyItem | null>(null)
@@ -120,72 +110,7 @@ export default function FamiliesPage() {
         </button>
       </div>
 
-      {showFilter === 'vegetarian' && (
-        <div className="space-y-4">
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-stone-500">Showing:</span>
-            <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700">
-              Vegetarian Guests
-            </span>
-            <button
-              onClick={() => setSearchParams({})}
-              className="rounded px-2 py-1 text-xs text-stone-500 hover:bg-stone-100 hover:text-stone-700"
-            >
-              Clear
-            </button>
-          </div>
-
-          {isLoading && (
-            <div className="space-y-2">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="h-10 animate-pulse rounded bg-stone-100" />
-              ))}
-            </div>
-          )}
-
-          {!isLoading && vegetarianGuests.length === 0 && (
-            <EmptyState title="No vegetarian guests" description="No guests are marked as vegetarian." />
-          )}
-
-          {!isLoading && vegetarianGuests.length > 0 && (
-            <div className="overflow-x-auto rounded-lg border border-stone-200">
-              <table className="w-full text-left text-sm">
-                <thead className="border-b border-stone-200 bg-stone-50">
-                  <tr>
-                    <th className="px-4 py-3 font-medium text-stone-600">Guest Name</th>
-                    <th className="px-4 py-3 font-medium text-stone-600">Family</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-stone-100">
-                  {vegetarianGuests.map((entry) => (
-                    <tr key={`${entry.familyId}-${entry.guestName}`} className="hover:bg-stone-50">
-                      <td className="px-4 py-3 text-stone-900">
-                        <div className="flex items-center gap-2">
-                          {entry.guestName}
-                          <span className="rounded bg-green-100 px-1.5 py-0.5 text-[10px] font-medium text-green-700">
-                            Vegetarian
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3">
-                        <Link
-                          to={ROUTES.FAMILY_DETAIL(entry.familyId)}
-                          className="text-stone-700 hover:underline"
-                        >
-                          {entry.familyName}
-                        </Link>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      )}
-
-      {showFilter !== 'vegetarian' && (
-        <div className="space-y-3">
+      <div className="space-y-3">
           <input
             type="search"
             placeholder="Search families..."
@@ -305,15 +230,14 @@ export default function FamiliesPage() {
             )}
           </div>
         </div>
-      )}
 
-      {showFilter !== 'vegetarian' && error && (
+      {error && (
         <div role="alert" className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           Failed to load families.
         </div>
       )}
 
-      {showFilter !== 'vegetarian' && isLoading && (
+      {isLoading && (
         <div className="space-y-2">
           {Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="h-14 animate-pulse rounded bg-stone-100" />
@@ -321,7 +245,7 @@ export default function FamiliesPage() {
         </div>
       )}
 
-      {showFilter !== 'vegetarian' && data && families.length === 0 && (hasActiveFilters || debouncedSearch) && (
+      {data && families.length === 0 && (hasActiveFilters || debouncedSearch) && (
         <EmptyState
           title="No matching families"
           description="Try adjusting or clearing the search and filters."
@@ -338,7 +262,7 @@ export default function FamiliesPage() {
         />
       )}
 
-      {showFilter !== 'vegetarian' && data && families.length === 0 && !hasActiveFilters && !debouncedSearch && (
+      {data && families.length === 0 && !hasActiveFilters && !debouncedSearch && (
         <EmptyState
           title="No families yet"
           description="Add a family to get started."
@@ -353,7 +277,7 @@ export default function FamiliesPage() {
         />
       )}
 
-      {showFilter !== 'vegetarian' && data && families.length > 0 && (
+      {data && families.length > 0 && (
         <>
           {/* Mobile/tablet: card list */}
           <div className="space-y-3 lg:hidden">
