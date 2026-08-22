@@ -10,6 +10,7 @@ import type { T_adminGetRsvpManager } from "./api/adminGetRsvpManager";
 import type { T_adminCreateRsvpManager } from "./api/adminCreateRsvpManager";
 import type { T_adminUpdateRsvpManager } from "./api/adminUpdateRsvpManager";
 import type { T_adminDeleteRsvpManager } from "./api/adminDeleteRsvpManager";
+import type { T_adminGetGuests } from "./api/adminGetGuests";
 import type { T_adminAddGuest } from "./api/adminAddGuest";
 import type { T_adminUpdateGuest } from "./api/adminUpdateGuest";
 import type { T_adminDeleteGuest } from "./api/adminDeleteGuest";
@@ -125,6 +126,10 @@ export namespace AxiosClient {
   export const adminDeleteRsvpManager: T_adminDeleteRsvpManager = async (req, base_url: string = BaseURL.instance.base_url) => {
     const final_url = __build_path(base_url, '/admin/rsvp-managers/:manager_id', req.path);
     return (await axios['delete'](final_url, { headers: req.headers as any, })).data as any;
+  }
+  export const adminGetGuests: T_adminGetGuests = async (req, base_url: string = BaseURL.instance.base_url) => {
+    const final_url = __build_path(base_url, '/admin/guests', {});
+    return (await axios['get'](final_url, { headers: req.headers as any, params: req.query as any, })).data as any;
   }
   export const adminAddGuest: T_adminAddGuest = async (req, base_url: string = BaseURL.instance.base_url) => {
     const final_url = __build_path(base_url, '/admin/families/:family_id/guests', req.path);
