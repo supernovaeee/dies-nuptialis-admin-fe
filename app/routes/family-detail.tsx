@@ -14,7 +14,6 @@ import { Modal } from '~/components/ui/Modal'
 import { ConfirmDialog } from '~/components/ui/ConfirmDialog'
 import { RichTextEditor } from '~/components/ui/RichTextEditor'
 import { InviteActionButtons } from '~/components/InviteActionButtons'
-import { RSVPStatus } from '@api/model/enum/RSVPStatus'
 import type { AdminFamilyItem } from '@api/schema/AdminFamilyItem'
 import type { GuestItem } from '@api/schema/GuestItem'
 
@@ -109,7 +108,6 @@ function FamilyInfoSection({ family }: { family: AdminFamilyItem }) {
   const [editing, setEditing] = useState(false)
   const [famName, setFamName] = useState(family.fam_name)
   const [paxAllowed, setPaxAllowed] = useState(family.pax_allowed)
-  const [marker, setMarker] = useState(family.attending_main_status_marker ?? '')
 
   function handleSave(e: FormEvent) {
     e.preventDefault()
@@ -119,7 +117,6 @@ function FamilyInfoSection({ family }: { family: AdminFamilyItem }) {
         body: {
           fam_name: famName,
           pax_allowed: paxAllowed,
-          attending_main_status_marker: marker,
         },
       },
       {
@@ -137,7 +134,6 @@ function FamilyInfoSection({ family }: { family: AdminFamilyItem }) {
   function handleCancel() {
     setFamName(family.fam_name)
     setPaxAllowed(family.pax_allowed)
-    setMarker(family.attending_main_status_marker ?? '')
     setEditing(false)
   }
 
@@ -184,21 +180,13 @@ function FamilyInfoSection({ family }: { family: AdminFamilyItem }) {
             />
           </div>
           {!family.has_rsvp && (
-            <div className="space-y-1">
-              <label htmlFor="edit_marker" className="block text-xs font-medium text-stone-600">
-                Attendance Marker (admin-only — this family hasn&apos;t submitted an RSVP)
-              </label>
-              <select
-                id="edit_marker"
-                value={marker}
-                onChange={(e) => setMarker(e.target.value)}
-                className="w-full rounded border border-stone-300 px-3 py-1.5 text-sm text-stone-900 focus:border-stone-500 focus:ring-1 focus:ring-stone-500 focus:outline-none"
-              >
-                <option value="">Not marked</option>
-                <option value={RSVPStatus.ATTENDING}>ATTENDING</option>
-                <option value={RSVPStatus.DECLINED}>DECLINED</option>
-              </select>
-            </div>
+            <p className="text-xs text-stone-500">
+              Attendance marker: {family.attending_main_status_marker ?? 'Not marked'} — edit this from the{' '}
+              <Link to={ROUTES.FAMILIES} className="underline hover:text-stone-700">
+                Families dashboard
+              </Link>
+              .
+            </p>
           )}
           <div className="flex gap-2 pt-1">
             <button

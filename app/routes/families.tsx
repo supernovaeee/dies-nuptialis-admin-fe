@@ -14,6 +14,7 @@ import { EmptyState } from '~/components/ui/EmptyState'
 import { Pagination } from '~/components/ui/Pagination'
 import { InviteActionButtons } from '~/components/InviteActionButtons'
 import { RsvpBadge } from '~/components/RsvpBadge'
+import { AttendanceCell } from '~/components/AttendanceCell'
 import { RSVPStatus } from '@api/model/enum/RSVPStatus'
 import type { AdminFamilyItem } from '@api/schema/AdminFamilyItem'
 
@@ -35,7 +36,15 @@ export default function FamiliesPage() {
   const letterFilter = searchParams.get('letter') ?? ''
   const guestsMinFilter = searchParams.get('guests_min') ?? ''
   const guestsMaxFilter = searchParams.get('guests_max') ?? ''
-  const hasActiveFilters = !!(managerFilter || statusFilter || letterFilter || guestsMinFilter || guestsMaxFilter)
+  const attendanceFilter = searchParams.get('attendance') ?? ''
+  const hasActiveFilters = !!(
+    managerFilter ||
+    statusFilter ||
+    letterFilter ||
+    guestsMinFilter ||
+    guestsMaxFilter ||
+    attendanceFilter
+  )
 
   function setFilter(key: string, value: string) {
     const next = new URLSearchParams(searchParams)
@@ -47,7 +56,7 @@ export default function FamiliesPage() {
 
   function clearAllFilters() {
     const next = new URLSearchParams(searchParams)
-    for (const key of ['manager', 'status', 'letter', 'guests_min', 'guests_max']) next.delete(key)
+    for (const key of ['manager', 'status', 'letter', 'guests_min', 'guests_max', 'attendance']) next.delete(key)
     setSearchParams(next)
     setPage(0)
   }
@@ -70,11 +79,20 @@ export default function FamiliesPage() {
 
   const families = useMemo(() => {
     if (!data) return []
+    let result = data.data
     // The API has no server-side "unassigned" filter — it simply omits
     // rsvp_manager_name for families without a manager, so detect it here.
-    if (managerFilter !== UNASSIGNED_MANAGER) return data.data
-    return data.data.filter((family) => !family.rsvp_manager_name)
-  }, [data, managerFilter])
+    if (managerFilter === UNASSIGNED_MANAGER) {
+      result = result.filter((family) => !family.rsvp_manager_name)
+    }
+    // Same story for the attendance marker — it's admin-set client data, not a server filter.
+    if (attendanceFilter === 'unmarked') {
+      result = result.filter((family) => !family.has_rsvp && !family.attending_main_status_marker)
+    } else if (attendanceFilter === RSVPStatus.ATTENDING || attendanceFilter === RSVPStatus.DECLINED) {
+      result = result.filter((family) => !family.has_rsvp && family.attending_main_status_marker === attendanceFilter)
+    }
+    return result
+  }, [data, managerFilter, attendanceFilter])
 
   const vegetarianGuests = useMemo(() => {
     if (showFilter !== 'vegetarian' || !data) return []
@@ -248,6 +266,23 @@ export default function FamiliesPage() {
             </div>
 
             <div className="space-y-1">
+              <label htmlFor="filter-attendance" className="block text-xs font-medium text-stone-500">
+                Attendance
+              </label>
+              <select
+                id="filter-attendance"
+                value={attendanceFilter}
+                onChange={(e) => setFilter('attendance', e.target.value)}
+                className={FILTER_CONTROL_CLASS}
+              >
+                <option value="">All</option>
+                <option value="unmarked">Needs marking</option>
+                <option value={RSVPStatus.ATTENDING}>Marked Attending</option>
+                <option value={RSVPStatus.DECLINED}>Marked Declined</option>
+              </select>
+            </div>
+
+            <div className="space-y-1">
               <span className="block text-xs font-medium text-stone-500">Guests</span>
               <div className="flex items-center gap-1.5">
                 <input
@@ -367,9 +402,12 @@ export default function FamiliesPage() {
                     <dt className="text-stone-500">RSVP</dt>
                     <dd className="mt-0.5 flex items-center">
                       <RsvpBadge status={family.rsvp_status} />
-                      {!family.has_rsvp && family.attending_main_status_marker && (
-                        <span className="ml-1 text-stone-400">(marked: {family.attending_main_status_marker})</span>
-                      )}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-stone-500">Attendance</dt>
+                    <dd className="mt-0.5">
+                      <AttendanceCell family={family} />
                     </dd>
                   </div>
                   <div>
@@ -401,6 +439,7 @@ export default function FamiliesPage() {
                   <th className="px-4 py-3 font-medium text-stone-600 text-center">Pax</th>
                   <th className="px-4 py-3 font-medium text-stone-600 text-center">Guests</th>
                   <th className="px-4 py-3 font-medium text-stone-600 text-center">RSVP</th>
+                  <th className="px-4 py-3 font-medium text-stone-600 text-center">Attendance</th>
                   <th className="px-4 py-3 font-medium text-stone-600 text-center">Letter</th>
                   <th className="px-4 py-3 font-medium text-stone-600">Manager</th>
                   <th className="px-4 py-3 font-medium text-stone-600" />
@@ -429,10 +468,10 @@ export default function FamiliesPage() {
                     <td className="px-4 py-3 text-center">
                       <div className="flex items-center justify-center">
                         <RsvpBadge status={family.rsvp_status} />
-                        {!family.has_rsvp && family.attending_main_status_marker && (
-                          <span className="ml-1 text-xs text-stone-400">(marked: {family.attending_main_status_marker})</span>
-                        )}
                       </div>
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <AttendanceCell family={family} />
                     </td>
                     <td className="px-4 py-3 text-center">
                       <StatusBadge active={family.has_letter} />
