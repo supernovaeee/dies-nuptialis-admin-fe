@@ -11,6 +11,7 @@ export interface T_adminGetFamilies_query {
   rsvp_manager_id?: number
   rsvp_status?: string
   attending_main_status_marker?: string
+  effective_status?: string
   has_letter?: boolean
   guests_min?: number
   guests_max?: number

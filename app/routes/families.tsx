@@ -36,13 +36,15 @@ export default function FamiliesPage() {
   const guestsMinFilter = searchParams.get('guests_min') ?? ''
   const guestsMaxFilter = searchParams.get('guests_max') ?? ''
   const attendanceFilter = searchParams.get('attendance') ?? ''
+  const effectiveFilter = searchParams.get('effective') ?? ''
   const hasActiveFilters = !!(
     managerFilter ||
     statusFilter ||
     letterFilter ||
     guestsMinFilter ||
     guestsMaxFilter ||
-    attendanceFilter
+    attendanceFilter ||
+    effectiveFilter
   )
 
   function setFilter(key: string, value: string) {
@@ -53,9 +55,24 @@ export default function FamiliesPage() {
     setPage(0)
   }
 
+  // "RSVP Status" / "Attendance" are precise, narrow filters (real RSVP only /
+  // marker only); "effective" is the broader "RSVP OR marker" view used by the
+  // Dashboard's Attending/Declined links. Combining effective with either of the
+  // others would AND into an impossible query server-side, so picking one clears
+  // the other.
+  function setPreciseFilter(key: 'status' | 'attendance', value: string) {
+    const next = new URLSearchParams(searchParams)
+    if (value) next.set(key, value)
+    else next.delete(key)
+    next.delete('effective')
+    setSearchParams(next)
+    setPage(0)
+  }
+
   function clearAllFilters() {
     const next = new URLSearchParams(searchParams)
-    for (const key of ['manager', 'status', 'letter', 'guests_min', 'guests_max', 'attendance']) next.delete(key)
+    for (const key of ['manager', 'status', 'letter', 'guests_min', 'guests_max', 'attendance', 'effective'])
+      next.delete(key)
     setSearchParams(next)
     setPage(0)
   }
@@ -69,8 +86,11 @@ export default function FamiliesPage() {
       // (see familyRepository.ts) — everything else is an exact FK match.
       rsvpManagerId:
         managerFilter === UNASSIGNED_MANAGER ? 0 : managerFilter ? Number(managerFilter) : undefined,
-      rsvpStatus: statusFilter || undefined,
-      attendingMainStatusMarker: attendanceFilter || undefined,
+      // effective takes precedence — it can't be combined with the two precise
+      // filters below without the backend ANDing them into an impossible query.
+      rsvpStatus: !effectiveFilter && statusFilter ? statusFilter : undefined,
+      attendingMainStatusMarker: !effectiveFilter && attendanceFilter ? attendanceFilter : undefined,
+      effectiveStatus: effectiveFilter || undefined,
       hasLetter: letterFilter ? letterFilter === 'true' : undefined,
       guestsMin: guestsMinFilter !== '' ? Number(guestsMinFilter) : undefined,
       guestsMax: guestsMaxFilter !== '' ? Number(guestsMaxFilter) : undefined,
@@ -109,6 +129,21 @@ export default function FamiliesPage() {
           Add Family
         </button>
       </div>
+
+      {effectiveFilter && (
+        <div className="flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
+          <span>
+            Showing: Effectively {effectiveFilter === RSVPStatus.DECLINED ? 'Declined' : 'Attending'} (RSVP
+            submitted, or manually marked)
+          </span>
+          <button
+            onClick={() => setFilter('effective', '')}
+            className="ml-auto rounded px-2 py-0.5 text-xs font-medium text-emerald-800 hover:bg-emerald-100"
+          >
+            Clear
+          </button>
+        </div>
+      )}
 
       <div className="space-y-3">
           <input
@@ -150,7 +185,7 @@ export default function FamiliesPage() {
               <select
                 id="filter-status"
                 value={statusFilter}
-                onChange={(e) => setFilter('status', e.target.value)}
+                onChange={(e) => setPreciseFilter('status', e.target.value)}
                 className={FILTER_CONTROL_CLASS}
               >
                 <option value="">All statuses</option>
@@ -185,7 +220,7 @@ export default function FamiliesPage() {
               <select
                 id="filter-attendance"
                 value={attendanceFilter}
-                onChange={(e) => setFilter('attendance', e.target.value)}
+                onChange={(e) => setPreciseFilter('attendance', e.target.value)}
                 className={FILTER_CONTROL_CLASS}
               >
                 <option value="">All</option>

@@ -9,13 +9,15 @@ export interface FamilyFilters {
   rsvpManagerId?: number
   rsvpStatus?: string
   attendingMainStatusMarker?: string
+  effectiveStatus?: string
   hasLetter?: boolean
   guestsMin?: number
   guestsMax?: number
 }
 
 export function useFamilies(filters: FamilyFilters = {}, page = 0, limit = 50) {
-  const { q, rsvpManagerId, rsvpStatus, attendingMainStatusMarker, hasLetter, guestsMin, guestsMax } = filters
+  const { q, rsvpManagerId, rsvpStatus, attendingMainStatusMarker, effectiveStatus, hasLetter, guestsMin, guestsMax } =
+    filters
 
   return useQuery<AdminFamilyList>({
     queryKey: QUERY_KEYS.FAMILIES(
@@ -24,6 +26,7 @@ export function useFamilies(filters: FamilyFilters = {}, page = 0, limit = 50) {
       rsvpManagerId,
       rsvpStatus,
       attendingMainStatusMarker,
+      effectiveStatus,
       hasLetter,
       guestsMin,
       guestsMax,
@@ -38,6 +41,7 @@ export function useFamilies(filters: FamilyFilters = {}, page = 0, limit = 50) {
           rsvp_manager_id: rsvpManagerId,
           rsvp_status: rsvpStatus,
           attending_main_status_marker: attendingMainStatusMarker,
+          effective_status: effectiveStatus,
           has_letter: hasLetter,
           guests_min: guestsMin,
           guests_max: guestsMax,

@@ -40,7 +40,7 @@ export default function DashboardPage() {
           subtitle={data ? `${data.attending_members} members` : undefined}
           loading={isLoading}
           color="emerald"
-          to={`${ROUTES.RSVPS}?main=ATTENDING`}
+          to={`${ROUTES.FAMILIES}?effective=ATTENDING`}
         />
         <SummaryCard
           label="Declined"
