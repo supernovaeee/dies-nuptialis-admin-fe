@@ -9,6 +9,7 @@ export interface AdminFamilyItem {
   guests: GuestItem[]
   has_rsvp: boolean
   rsvp_status: string
+  attending_main_status_marker?: string
   has_letter: boolean
   rsvp_manager_id?: number
   rsvp_manager_name?: string

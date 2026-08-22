@@ -12,6 +12,7 @@ export interface T_adminUpdateFamily_body {
   pax_allowed?: number
   after_party_allowed?: boolean
   rsvp_manager_id?: number
+  attending_main_status_marker?: string
 }
 
 

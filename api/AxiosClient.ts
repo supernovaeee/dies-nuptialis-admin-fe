@@ -224,7 +224,7 @@ export namespace AxiosClient {
   }
   export const managerGetFamilies: T_managerGetFamilies = async (req, base_url: string = BaseURL.instance.base_url) => {
     const final_url = __build_path(base_url, '/manager/families', {});
-    return (await axios['get'](final_url, { headers: req.headers as any, })).data as any;
+    return (await axios['get'](final_url, { headers: req.headers as any, params: req.query as any, })).data as any;
   }
   export const managerUpdateMessage: T_managerUpdateMessage = async (req, base_url: string = BaseURL.instance.base_url) => {
     const final_url = __build_path(base_url, '/manager/message', {});

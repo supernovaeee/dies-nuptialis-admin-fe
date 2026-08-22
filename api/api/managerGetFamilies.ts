@@ -4,11 +4,17 @@ import type { ManagerFamilyList } from '../schema/ManagerFamilyList'
 export interface T_managerGetFamilies_headers {
   authorization: string
 }
+export interface T_managerGetFamilies_query {
+  limit?: number
+  offset?: number
+  q?: string
+}
 
 
 
 export type T_managerGetFamilies = (request: {
   headers: T_managerGetFamilies_headers
+  query: T_managerGetFamilies_query
 }, base_url?: string) => Promise<ManagerFamilyList>;
 
 export const method = 'get';

@@ -365,8 +365,11 @@ export default function FamiliesPage() {
                   </div>
                   <div>
                     <dt className="text-stone-500">RSVP</dt>
-                    <dd className="mt-0.5">
+                    <dd className="mt-0.5 flex items-center">
                       <RsvpBadge status={family.rsvp_status} />
+                      {!family.has_rsvp && family.attending_main_status_marker && (
+                        <span className="ml-1 text-stone-400">(marked: {family.attending_main_status_marker})</span>
+                      )}
                     </dd>
                   </div>
                   <div>
@@ -424,7 +427,12 @@ export default function FamiliesPage() {
                       {family.guests.length}
                     </td>
                     <td className="px-4 py-3 text-center">
-                      <RsvpBadge status={family.rsvp_status} />
+                      <div className="flex items-center justify-center">
+                        <RsvpBadge status={family.rsvp_status} />
+                        {!family.has_rsvp && family.attending_main_status_marker && (
+                          <span className="ml-1 text-xs text-stone-400">(marked: {family.attending_main_status_marker})</span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-4 py-3 text-center">
                       <StatusBadge active={family.has_letter} />
