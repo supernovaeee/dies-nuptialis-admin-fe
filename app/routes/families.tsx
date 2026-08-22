@@ -71,6 +71,7 @@ export default function FamiliesPage() {
       rsvpManagerId:
         managerFilter === UNASSIGNED_MANAGER ? 0 : managerFilter ? Number(managerFilter) : undefined,
       rsvpStatus: statusFilter || undefined,
+      attendingMainStatusMarker: attendanceFilter || undefined,
       hasLetter: letterFilter ? letterFilter === 'true' : undefined,
       guestsMin: guestsMinFilter !== '' ? Number(guestsMinFilter) : undefined,
       guestsMax: guestsMaxFilter !== '' ? Number(guestsMaxFilter) : undefined,
@@ -79,18 +80,7 @@ export default function FamiliesPage() {
     showFilter === 'vegetarian' ? 500 : LIMIT,
   )
 
-  const families = useMemo(() => {
-    if (!data) return []
-    let result = data.data
-    // The API has no server-side filter for the attendance marker — it's
-    // admin-set client data, not something the backend can query on yet.
-    if (attendanceFilter === 'unmarked') {
-      result = result.filter((family) => !family.has_rsvp && !family.attending_main_status_marker)
-    } else if (attendanceFilter === RSVPStatus.ATTENDING || attendanceFilter === RSVPStatus.DECLINED) {
-      result = result.filter((family) => !family.has_rsvp && family.attending_main_status_marker === attendanceFilter)
-    }
-    return result
-  }, [data, attendanceFilter])
+  const families = data?.data ?? []
 
   const vegetarianGuests = useMemo(() => {
     if (showFilter !== 'vegetarian' || !data) return []

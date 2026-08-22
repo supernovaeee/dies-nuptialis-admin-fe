@@ -8,16 +8,26 @@ export interface FamilyFilters {
   q?: string
   rsvpManagerId?: number
   rsvpStatus?: string
+  attendingMainStatusMarker?: string
   hasLetter?: boolean
   guestsMin?: number
   guestsMax?: number
 }
 
 export function useFamilies(filters: FamilyFilters = {}, page = 0, limit = 50) {
-  const { q, rsvpManagerId, rsvpStatus, hasLetter, guestsMin, guestsMax } = filters
+  const { q, rsvpManagerId, rsvpStatus, attendingMainStatusMarker, hasLetter, guestsMin, guestsMax } = filters
 
   return useQuery<AdminFamilyList>({
-    queryKey: QUERY_KEYS.FAMILIES(q, page, rsvpManagerId, rsvpStatus, hasLetter, guestsMin, guestsMax),
+    queryKey: QUERY_KEYS.FAMILIES(
+      q,
+      page,
+      rsvpManagerId,
+      rsvpStatus,
+      attendingMainStatusMarker,
+      hasLetter,
+      guestsMin,
+      guestsMax,
+    ),
     queryFn: () =>
       AxiosClient.adminGetFamilies({
         headers: AUTH_HEADER,
@@ -27,6 +37,7 @@ export function useFamilies(filters: FamilyFilters = {}, page = 0, limit = 50) {
           q,
           rsvp_manager_id: rsvpManagerId,
           rsvp_status: rsvpStatus,
+          attending_main_status_marker: attendingMainStatusMarker,
           has_letter: hasLetter,
           guests_min: guestsMin,
           guests_max: guestsMax,
