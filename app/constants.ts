@@ -52,4 +52,5 @@ export const QUERY_KEYS = {
   FAQS: ['faqs'] as const,
   RSVP_MANAGERS: (q?: string, page?: number) => ['rsvp-managers', q, page] as const,
   MANAGER_FAMILIES: ['manager-families'] as const,
+  ADMIN_MESSAGE: ['admin-message'] as const,
 } as const

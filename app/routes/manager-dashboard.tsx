@@ -1,15 +1,25 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { useManagerFamilies } from '~/hooks/useManagerFamilies'
 import { useUpdateManagerMessage } from '~/hooks/useUpdateManagerMessage'
 import { useToast } from '~/context/ToastContext'
 import { getApiErrorMessage } from '~/lib/apiError'
 import { EmptyState } from '~/components/ui/EmptyState'
 import { InviteActionButtons } from '~/components/InviteActionButtons'
+import { MessageTemplateCard } from '~/components/MessageTemplateCard'
 import { RsvpBadge } from '~/components/RsvpBadge'
 import { RSVPStatus } from '@api/model/enum/RSVPStatus'
 
 export default function ManagerDashboardPage() {
   const { data, isLoading, error } = useManagerFamilies()
+  const toast = useToast()
+  const updateMessage = useUpdateManagerMessage()
+
+  function handleSaveMessage(message: string) {
+    updateMessage.mutate(message, {
+      onSuccess: () => toast.success('Message template saved'),
+      onError: (err) => toast.error(getApiErrorMessage(err, 'Failed to save message template')),
+    })
+  }
 
   const summary = useMemo(() => {
     const families = data?.data ?? []
@@ -33,7 +43,14 @@ export default function ManagerDashboardPage() {
         <GuestSummary invited={summary.invited} attending={summary.attending} declined={summary.declined} />
       )}
 
-      {data && <MessageTemplateCard managerMessage={data.manager_message} />}
+      {data && (
+        <MessageTemplateCard
+          message={data.manager_message}
+          isSaving={updateMessage.isPending}
+          onSave={handleSaveMessage}
+          description={'Used by the "Copy Message" button for every guest below.'}
+        />
+      )}
 
       {error && (
         <div role="alert" className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -188,59 +205,3 @@ function GuestSummarySkeleton() {
   )
 }
 
-function MessageTemplateCard({ managerMessage }: { managerMessage?: string }) {
-  const toast = useToast()
-  const updateMessage = useUpdateManagerMessage()
-  const [message, setMessage] = useState(managerMessage ?? '')
-  const [dirty, setDirty] = useState(false)
-
-  useEffect(() => {
-    setMessage(managerMessage ?? '')
-    setDirty(false)
-  }, [managerMessage])
-
-  function handleSave() {
-    updateMessage.mutate(message, {
-      onSuccess: () => {
-        toast.success('Message template saved')
-        setDirty(false)
-      },
-      onError: (err) => {
-        toast.error(getApiErrorMessage(err, 'Failed to save message template'))
-      },
-    })
-  }
-
-  return (
-    <div className="space-y-2 rounded-lg border border-stone-200 bg-white p-4">
-      <label htmlFor="message_template" className="block text-sm font-medium text-stone-700">
-        Message Template
-      </label>
-      <textarea
-        id="message_template"
-        rows={5}
-        placeholder={"Dear {{name}},\n\nYou're invited to our wedding! Please RSVP here:\n\n{{link}}"}
-        value={message}
-        onChange={(e) => {
-          setMessage(e.target.value)
-          setDirty(true)
-        }}
-        className="w-full rounded border border-stone-300 px-3 py-2 text-sm text-stone-900 focus:border-stone-500 focus:ring-1 focus:ring-stone-500 focus:outline-none"
-      />
-      <p className="text-xs text-stone-500">
-        Used by the "Copy Message" button for every guest below. Leave blank to use the default message. Use{' '}
-        <code className="rounded bg-stone-100 px-1">{'{{name}}'}</code> and{' '}
-        <code className="rounded bg-stone-100 px-1">{'{{link}}'}</code> as placeholders — they'll be filled in per guest.
-      </p>
-      <div className="flex justify-end">
-        <button
-          onClick={handleSave}
-          disabled={updateMessage.isPending || !dirty}
-          className="rounded bg-stone-900 px-3 py-1.5 text-sm font-medium text-white hover:bg-stone-800 disabled:opacity-50"
-        >
-          {updateMessage.isPending ? 'Saving...' : 'Save'}
-        </button>
-      </div>
-    </div>
-  )
-}

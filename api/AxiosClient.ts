@@ -1,5 +1,7 @@
 import axios from 'axios';
 import type { T_adminSignIn } from "./api/adminSignIn";
+import type { T_adminGetMessage } from "./api/adminGetMessage";
+import type { T_adminUpdateMessage } from "./api/adminUpdateMessage";
 import type { T_adminGetFamilies } from "./api/adminGetFamilies";
 import type { T_adminGetFamily } from "./api/adminGetFamily";
 import type { T_adminCreateFamily } from "./api/adminCreateFamily";
@@ -86,6 +88,14 @@ export namespace AxiosClient {
   export const adminSignIn: T_adminSignIn = async (req, base_url: string = BaseURL.instance.base_url) => {
     const final_url = __build_path(base_url, '/admin/auth', {});
     return (await axios['post'](final_url, req.body, { })).data as any;
+  }
+  export const adminGetMessage: T_adminGetMessage = async (req, base_url: string = BaseURL.instance.base_url) => {
+    const final_url = __build_path(base_url, '/admin/message', {});
+    return (await axios['get'](final_url, { headers: req.headers as any, })).data as any;
+  }
+  export const adminUpdateMessage: T_adminUpdateMessage = async (req, base_url: string = BaseURL.instance.base_url) => {
+    const final_url = __build_path(base_url, '/admin/message', {});
+    return (await axios['patch'](final_url, req.body, { headers: req.headers as any, })).data as any;
   }
   export const adminGetFamilies: T_adminGetFamilies = async (req, base_url: string = BaseURL.instance.base_url) => {
     const final_url = __build_path(base_url, '/admin/families', {});

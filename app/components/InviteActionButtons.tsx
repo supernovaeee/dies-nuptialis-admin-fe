@@ -2,7 +2,7 @@ import { useCopyInvite } from '~/hooks/useCopyInvite'
 
 interface InviteActionButtonsProps {
   family: { fam_name: string; invite_code: string }
-  /** RSVP manager's own message template, if any — see manager-dashboard.tsx */
+  /** Admin or RSVP manager's message template, if any — see families.tsx / manager-dashboard.tsx */
   template?: string
   className?: string
 }

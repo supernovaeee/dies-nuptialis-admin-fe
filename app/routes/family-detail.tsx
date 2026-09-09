@@ -6,6 +6,7 @@ import { useDeleteFamily } from '~/hooks/useDeleteFamily'
 import { useRsvpManagers } from '~/hooks/useRsvpManagers'
 import { useAddGuest, useUpdateGuest, useDeleteGuest } from '~/hooks/useGuests'
 import { useLetter, useUpsertLetter } from '~/hooks/useLetter'
+import { useAdminMessage } from '~/hooks/useAdminMessage'
 import { useToast } from '~/context/ToastContext'
 import { getApiErrorMessage } from '~/lib/apiError'
 import { sanitizeHtml } from '~/lib/sanitizeHtml'
@@ -23,6 +24,7 @@ export default function FamilyDetailPage() {
   const toast = useToast()
 
   const { data: family, isLoading, error } = useFamily(familyId)
+  const { data: adminMessageData } = useAdminMessage()
 
   const deleteFamily = useDeleteFamily()
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
@@ -74,7 +76,7 @@ export default function FamilyDetailPage() {
           <p className="font-mono text-xs text-stone-400">{family.invite_code}</p>
         </div>
         <div className="flex items-center gap-1">
-          <InviteActionButtons family={family} />
+          <InviteActionButtons family={family} template={adminMessageData?.message} />
           <span className="mx-1 h-4 w-px bg-stone-200" />
           <button
             onClick={() => setShowDeleteConfirm(true)}

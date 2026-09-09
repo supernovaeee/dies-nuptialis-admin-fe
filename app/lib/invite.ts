@@ -34,9 +34,9 @@ With love,
 Azza & Marcel`
 }
 
-// When an RSVP manager has configured their own template (see
-// manager-dashboard.tsx), it takes over the "Copy Message" button for the
-// families tagged to them. {{name}} and {{link}} are substituted per family.
+// When an admin (families.tsx) or RSVP manager (manager-dashboard.tsx) has
+// configured a template, it takes over the "Copy Message" button for their
+// respective families. {{name}} and {{link}} are substituted per family.
 export function buildInviteMessage(family: InviteFamily, template?: string): string {
   const link = buildInviteLink(family)
   if (template?.trim()) {

@@ -5,6 +5,8 @@ import { useCreateFamily } from '~/hooks/useCreateFamily'
 import { useDeleteFamily } from '~/hooks/useDeleteFamily'
 import { useDebounce } from '~/hooks/useDebounce'
 import { useRsvpManagers } from '~/hooks/useRsvpManagers'
+import { useAdminMessage } from '~/hooks/useAdminMessage'
+import { useUpdateAdminMessage } from '~/hooks/useUpdateAdminMessage'
 import { useToast } from '~/context/ToastContext'
 import { getApiErrorMessage } from '~/lib/apiError'
 import { ROUTES } from '~/constants'
@@ -13,6 +15,7 @@ import { ConfirmDialog } from '~/components/ui/ConfirmDialog'
 import { EmptyState } from '~/components/ui/EmptyState'
 import { Pagination } from '~/components/ui/Pagination'
 import { InviteActionButtons } from '~/components/InviteActionButtons'
+import { MessageTemplateCard } from '~/components/MessageTemplateCard'
 import { RsvpBadge } from '~/components/RsvpBadge'
 import { AttendanceCell } from '~/components/AttendanceCell'
 import { RSVPStatus } from '@api/model/enum/RSVPStatus'
@@ -78,6 +81,15 @@ export default function FamiliesPage() {
   }
 
   const { data: managersData } = useRsvpManagers(undefined, 0, 200)
+  const { data: adminMessageData } = useAdminMessage()
+  const updateAdminMessage = useUpdateAdminMessage()
+
+  function handleSaveAdminMessage(message: string) {
+    updateAdminMessage.mutate(message, {
+      onSuccess: () => toast.success('Message template saved'),
+      onError: (err) => toast.error(getApiErrorMessage(err, 'Failed to save message template')),
+    })
+  }
 
   const { data, isLoading, error } = useFamilies(
     {
@@ -129,6 +141,13 @@ export default function FamiliesPage() {
           Add Family
         </button>
       </div>
+
+      <MessageTemplateCard
+        message={adminMessageData?.message}
+        isSaving={updateAdminMessage.isPending}
+        onSave={handleSaveAdminMessage}
+        description={'Used by the "Copy Message" button for every guest in this list.'}
+      />
 
       {effectiveFilter && (
         <div className="flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
@@ -370,7 +389,7 @@ export default function FamiliesPage() {
                 </p>
 
                 <div className="mt-3 flex flex-wrap items-center gap-1 border-t border-stone-100 pt-3">
-                  <InviteActionButtons family={family} />
+                  <InviteActionButtons family={family} template={adminMessageData?.message} />
                 </div>
               </div>
             ))}
@@ -428,7 +447,7 @@ export default function FamiliesPage() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-1">
-                        <InviteActionButtons family={family} />
+                        <InviteActionButtons family={family} template={adminMessageData?.message} />
                         <span className="mx-1 h-4 w-px bg-stone-200" />
                         <button
                           onClick={() => setDeleteTarget(family)}
