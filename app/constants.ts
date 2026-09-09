@@ -51,6 +51,6 @@ export const QUERY_KEYS = {
   CAROUSEL_CARDS: ['carousel-cards'] as const,
   FAQS: ['faqs'] as const,
   RSVP_MANAGERS: (q?: string, page?: number) => ['rsvp-managers', q, page] as const,
-  MANAGER_FAMILIES: ['manager-families'] as const,
+  MANAGER_FAMILIES: (page: number) => ['manager-families', page] as const,
   ADMIN_MESSAGE: ['admin-message'] as const,
 } as const

@@ -1,16 +1,21 @@
-import { useMemo } from 'react'
+import { useState } from 'react'
 import { useManagerFamilies } from '~/hooks/useManagerFamilies'
 import { useUpdateManagerMessage } from '~/hooks/useUpdateManagerMessage'
 import { useToast } from '~/context/ToastContext'
 import { getApiErrorMessage } from '~/lib/apiError'
 import { EmptyState } from '~/components/ui/EmptyState'
+import { Pagination } from '~/components/ui/Pagination'
 import { InviteActionButtons } from '~/components/InviteActionButtons'
 import { MessageTemplateCard } from '~/components/MessageTemplateCard'
 import { RsvpBadge } from '~/components/RsvpBadge'
 import { RSVPStatus } from '@api/model/enum/RSVPStatus'
+import type { ManagerFamilyItem } from '@api/schema/ManagerFamilyItem'
+
+const LIMIT = 20
 
 export default function ManagerDashboardPage() {
-  const { data, isLoading, error } = useManagerFamilies()
+  const [page, setPage] = useState(0)
+  const { data, isLoading, error } = useManagerFamilies(page, LIMIT)
   const toast = useToast()
   const updateMessage = useUpdateManagerMessage()
 
@@ -21,15 +26,6 @@ export default function ManagerDashboardPage() {
     })
   }
 
-  const summary = useMemo(() => {
-    const families = data?.data ?? []
-    return {
-      invited: families.length,
-      attending: families.filter((f) => f.rsvp_status === RSVPStatus.ATTENDING).length,
-      declined: families.filter((f) => f.rsvp_status === RSVPStatus.DECLINED).length,
-    }
-  }, [data])
-
   return (
     <div className="space-y-5">
       {data && (
@@ -39,8 +35,15 @@ export default function ManagerDashboardPage() {
       )}
 
       {isLoading && <GuestSummarySkeleton />}
-      {data && data.data.length > 0 && (
-        <GuestSummary invited={summary.invited} attending={summary.attending} declined={summary.declined} />
+      {data && data.attending_families + data.declined_families + data.pending_families > 0 && (
+        <GuestSummary
+          invitedFamilies={data.attending_families + data.declined_families + data.pending_families}
+          invitedGuests={data.attending_guests + data.declined_guests + data.pending_guests}
+          attendingFamilies={data.attending_families}
+          attendingGuests={data.attending_guests}
+          declinedFamilies={data.declined_families}
+          declinedGuests={data.declined_guests}
+        />
       )}
 
       {data && (
@@ -81,7 +84,7 @@ export default function ManagerDashboardPage() {
               <div key={family.id} className="rounded-lg border border-stone-200 bg-white p-4">
                 <div className="flex items-center justify-between gap-3">
                   <p className="font-medium text-stone-900">{family.fam_name}</p>
-                  <RsvpBadge status={family.rsvp_status} />
+                  <FamilyRsvpBadge family={family} />
                 </div>
                 <div className="mt-3 flex flex-wrap items-center gap-1 border-t border-stone-100 pt-3">
                   <InviteActionButtons family={family} template={data.manager_message} />
@@ -105,7 +108,7 @@ export default function ManagerDashboardPage() {
                   <tr key={family.id} className="hover:bg-stone-50">
                     <td className="px-4 py-3 font-medium text-stone-900">{family.fam_name}</td>
                     <td className="px-4 py-3">
-                      <RsvpBadge status={family.rsvp_status} />
+                      <FamilyRsvpBadge family={family} />
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex justify-end">
@@ -117,47 +120,89 @@ export default function ManagerDashboardPage() {
               </tbody>
             </table>
           </div>
+
+          <Pagination page={page} total={data.total} limit={LIMIT} onPageChange={setPage} />
         </>
       )}
     </div>
   )
 }
 
-interface GuestSummaryProps {
-  invited: number
-  attending: number
-  declined: number
+function FamilyRsvpBadge({ family }: { family: ManagerFamilyItem }) {
+  if (family.rsvp_status !== RSVPStatus.PENDING) {
+    return <RsvpBadge status={family.rsvp_status} />
+  }
+
+  return (
+    <div className="flex flex-col items-start gap-0.5">
+      <RsvpBadge status={RSVPStatus.PENDING} />
+      {family.attending_main_status_marker && (
+        <span className="text-[11px] text-stone-400">
+          Marked {family.attending_main_status_marker.toLowerCase()} by admin
+        </span>
+      )}
+    </div>
+  )
 }
 
-function GuestSummary({ invited, attending, declined }: GuestSummaryProps) {
-  const responded = attending + declined
-  const attendingPct = invited > 0 ? (attending / invited) * 100 : 0
-  const declinedPct = invited > 0 ? (declined / invited) * 100 : 0
+interface GuestSummaryProps {
+  invitedFamilies: number
+  invitedGuests: number
+  attendingFamilies: number
+  attendingGuests: number
+  declinedFamilies: number
+  declinedGuests: number
+}
+
+function GuestSummary({
+  invitedFamilies,
+  invitedGuests,
+  attendingFamilies,
+  attendingGuests,
+  declinedFamilies,
+  declinedGuests,
+}: GuestSummaryProps) {
+  const responded = attendingFamilies + declinedFamilies
+  const attendingPct = invitedFamilies > 0 ? (attendingFamilies / invitedFamilies) * 100 : 0
+  const declinedPct = invitedFamilies > 0 ? (declinedFamilies / invitedFamilies) * 100 : 0
 
   return (
     <div className="rounded-xl border border-stone-200 bg-white p-4 sm:p-5">
       <div className="grid grid-cols-3 divide-x divide-stone-100">
-        <SummaryStat label="Invited" value={invited} dotClassName="bg-stone-400" valueClassName="text-stone-900" />
+        <SummaryStat
+          label="Invited"
+          value={invitedFamilies}
+          subValue={`${invitedGuests} guests`}
+          dotClassName="bg-stone-400"
+          valueClassName="text-stone-900"
+        />
         <SummaryStat
           label="Attending"
-          value={attending}
+          value={attendingFamilies}
+          subValue={`${attendingGuests} guests`}
           dotClassName="bg-emerald-500"
           valueClassName="text-emerald-700"
         />
-        <SummaryStat label="Declined" value={declined} dotClassName="bg-red-500" valueClassName="text-red-700" />
+        <SummaryStat
+          label="Declined"
+          value={declinedFamilies}
+          subValue={`${declinedGuests} guests`}
+          dotClassName="bg-red-500"
+          valueClassName="text-red-700"
+        />
       </div>
 
       <div className="mt-4 space-y-1.5">
         <div className="flex items-center justify-between text-xs text-stone-500">
           <span>Responses received</span>
           <span className="font-medium text-stone-700">
-            {responded} / {invited}
+            {responded} / {invitedFamilies} families
           </span>
         </div>
         <div
           className="flex h-1.5 w-full overflow-hidden rounded-full bg-stone-100"
           role="img"
-          aria-label={`${attending} attending, ${declined} declined, out of ${invited} invited`}
+          aria-label={`${attendingFamilies} families attending, ${declinedFamilies} families declined, out of ${invitedFamilies} invited`}
         >
           <div className="h-full bg-emerald-500 transition-all" style={{ width: `${attendingPct}%` }} />
           <div className="h-full bg-red-400 transition-all" style={{ width: `${declinedPct}%` }} />
@@ -170,11 +215,12 @@ function GuestSummary({ invited, attending, declined }: GuestSummaryProps) {
 interface SummaryStatProps {
   label: string
   value: number
+  subValue: string
   dotClassName: string
   valueClassName: string
 }
 
-function SummaryStat({ label, value, dotClassName, valueClassName }: SummaryStatProps) {
+function SummaryStat({ label, value, subValue, dotClassName, valueClassName }: SummaryStatProps) {
   return (
     <div className="flex flex-col items-center gap-1 px-2 text-center first:pl-0 last:pr-0">
       <span className="flex items-center gap-1.5 text-xs text-stone-500">
@@ -182,6 +228,7 @@ function SummaryStat({ label, value, dotClassName, valueClassName }: SummaryStat
         {label}
       </span>
       <span className={`text-2xl font-semibold tabular-nums ${valueClassName}`}>{value}</span>
+      <span className="text-[11px] text-stone-400">{subValue}</span>
     </div>
   )
 }
